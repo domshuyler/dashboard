@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import './App.css'
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
 import Tasks from './pages/Tasks'
@@ -8,6 +9,15 @@ import Calendar from './pages/Calendar'
 import Chat from './pages/Chat'
 
 function App() {
+  useEffect(() => {
+  const hash = window.location.hash
+  const params = new URLSearchParams(hash.replace('#', '?'))
+  const accessToken = params.get('access_token')
+  if (accessToken) {
+    localStorage.setItem('google_token', accessToken)
+    window.history.replaceState({}, document.title, window.location.pathname)
+  }
+}, [])
   return (
     <BrowserRouter>
       <div className="app">
