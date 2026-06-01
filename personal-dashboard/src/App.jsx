@@ -7,6 +7,7 @@ import Habits from './pages/Habits'
 import Goals from './pages/Goals'
 import Calendar from './pages/Calendar'
 import Chat from './pages/Chat'
+import Notes from './pages/Notes'
 
 function App() {
   const [tasks, setTasks] = useState(() => {
@@ -15,14 +16,19 @@ function App() {
   })
 
   const [habits, setHabits] = useState(() => {
-    const saved = localStorage.getItem('habits')
-    return saved ? JSON.parse(saved) : []
-  })
+  const saved = localStorage.getItem('habits')
+  return saved ? JSON.parse(saved) : []
+})
 
   const [goals, setGoals] = useState(() => {
     const saved = localStorage.getItem('goals')
     return saved ? JSON.parse(saved) : []
   })
+
+  const [notes, setNotes] = useState(() => {
+  const saved = localStorage.getItem('notes')
+  return saved ? JSON.parse(saved) : []
+})
 
   const [calendarEvents, setCalendarEvents] = useState([])
 
@@ -38,6 +44,10 @@ function App() {
     localStorage.setItem('goals', JSON.stringify(goals))
   }, [goals])
 
+  useEffect(() => {
+  localStorage.setItem('notes', JSON.stringify(notes))
+}, [notes])
+
   return (
     <BrowserRouter>
       <div className="app">
@@ -50,6 +60,7 @@ function App() {
             <NavLink to="/goals">Goals</NavLink>
             <NavLink to="/calendar">Calendar</NavLink>
             <NavLink to="/chat">Chat</NavLink>
+            <NavLink to="/notes">Notes</NavLink>
           </nav>
         </aside>
         <main className="main-content">
@@ -75,6 +86,8 @@ function App() {
               <Calendar calendarEvents={calendarEvents} setCalendarEvents={setCalendarEvents} />}
             />
             <Route path="/chat" element={<Chat />} />
+
+            <Route path="/notes" element={<Notes notes={notes} setNotes={setNotes} />} />
           </Routes>
         </main>
       </div>

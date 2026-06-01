@@ -1,135 +1,109 @@
 import { useState } from 'react'
-import './Goals.css'
+import './Habits.css'
 
-function Goals({ goals, setGoals }) {
-  const [newGoal, setNewGoal] = useState({
-    title: '',
-    category: '',
-    deadline: '',
-    target: '',
-    current: 0,
-    unit: ''
+function Habits({ habits, setHabits }) {
+  const [newHabit, setNewHabit] = useState({
+    name: '',
+    category: ''
   })
 
-  const addGoal = () => {
-    if (!newGoal.title.trim()) return
-    setGoals([...goals, {
-      ...newGoal,
+  const today = new Date().toISOString().split('T')[0]
+
+  const addHabit = () => {
+    if (!newHabit.name.trim()) return
+    setHabits([...habits, {
+      ...newHabit,
       id: Date.now(),
-      completed: false,
-      target: newGoal.target ? Number(newGoal.target) : null,
-      current: 0
+      streak: 0,
+      lastCompleted: null,
+      completedToday: false
     }])
-    setNewGoal({
-      title: '',
-      category: '',
-      deadline: '',
-      target: '',
-      current: 0,
-      unit: ''
-    })
+    setNewHabit({ name: '', category: '' })
   }
 
-  const updateProgress = (id, value) => {
-    setGoals(goals.map(goal => {
-      if (goal.id !== id) return goal
-      const newCurrent = Math.min(Number(value), goal.target)
+  const toggleHabit = (id) => {
+    setHabits(habits.map(habit => {
+      if (habit.id !== id) return habit
+
+      if (habit.completedToday) {
+        return {
+          ...habit,
+          completedToday: false,
+          streak: habit.streak > 0 ? habit.streak - 1 : 0,
+          lastCompleted: null
+        }
+      }
+
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      const yesterdayStr = yesterday.toISOString().split('T')[0]
+      const newStreak = habit.lastCompleted === yesterdayStr ? habit.streak + 1 : 1
+
       return {
-        ...goal,
-        current: newCurrent,
-        completed: newCurrent >= goal.target
+        ...habit,
+        completedToday: true,
+        streak: newStreak,
+        lastCompleted: today
       }
     }))
   }
 
-  const deleteGoal = (id) => {
-    setGoals(goals.filter(goal => goal.id !== id))
+  const deleteHabit = (id) => {
+    setHabits(habits.filter(habit => habit.id !== id))
   }
 
-  const getProgress = (goal) => {
-    if (!goal.target) return null
-    return Math.round((goal.current / goal.target) * 100)
-  }
+  const grouped = habits.reduce((acc, habit) => {
+    const key = habit.category || 'Uncategorized'
+    if (!acc[key]) acc[key] = []
+    acc[key].push(habit)
+    return acc
+  }, {})
 
   return (
     <div className="page">
-      <h1>Goals</h1>
+      <h1>Habits</h1>
 
       <div className="task-form">
         <input
           type="text"
-          placeholder="Goal title..."
-          value={newGoal.title}
-          onChange={(e) => setNewGoal({ ...newGoal, title: e.target.value })}
+          placeholder="Habit name..."
+          value={newHabit.name}
+          onChange={(e) => setNewHabit({ ...newHabit, name: e.target.value })}
         />
         <input
           type="text"
           placeholder="Category..."
-          value={newGoal.category}
-          onChange={(e) => setNewGoal({ ...newGoal, category: e.target.value })}
+          value={newHabit.category}
+          onChange={(e) => setNewHabit({ ...newHabit, category: e.target.value })}
         />
-        <input
-          type="date"
-          value={newGoal.deadline}
-          onChange={(e) => setNewGoal({ ...newGoal, deadline: e.target.value })}
-        />
-        <input
-          type="number"
-          placeholder="Target (optional)..."
-          value={newGoal.target}
-          onChange={(e) => setNewGoal({ ...newGoal, target: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Unit (miles, pages...)..."
-          value={newGoal.unit}
-          onChange={(e) => setNewGoal({ ...newGoal, unit: e.target.value })}
-        />
-        <button onClick={addGoal}>Add Goal</button>
+        <button onClick={addHabit}>Add Habit</button>
       </div>
 
-      <div className="goal-list">
-        {goals.map(goal => (
-          <div key={goal.id} className={`goal-item ${goal.completed ? 'completed' : ''}`}>
-            <div className="goal-header">
-              <div className="task-info">
-                <span className="task-title">{goal.title}</span>
-                <div className="task-meta">
-                  {goal.category && <span className="category">{goal.category}</span>}
-                  {goal.deadline && <span className="due-date">Due: {goal.deadline}</span>}
-                  {goal.completed && <span className="priority priority-low">Completed</span>}
-                </div>
-              </div>
-              <button onClick={() => deleteGoal(goal.id)}>Delete</button>
-            </div>
-
-            {goal.target && (
-              <div className="goal-progress">
-                <div className="progress-bar-track">
-                  <div
-                    className="progress-bar-fill"
-                    style={{ width: `${getProgress(goal)}%` }}
-                  />
-                </div>
-                <div className="progress-info">
-                  <span>{goal.current} / {goal.target} {goal.unit}</span>
-                  <span>{getProgress(goal)}%</span>
-                </div>
+      {Object.entries(grouped).map(([category, habits]) => (
+        <div key={category} className="habit-group">
+          <h2 className="habit-category">{category}</h2>
+          <div className="task-list">
+            {habits.map(habit => (
+              <div key={habit.id} className={`task-item ${habit.completedToday ? 'completed' : ''}`}>
                 <input
-                  type="number"
-                  placeholder="Update progress..."
-                  onBlur={(e) => {
-                    updateProgress(goal.id, e.target.value)
-                    e.target.value = ''
-                  }}
+                  type="checkbox"
+                  checked={habit.completedToday}
+                  onChange={() => toggleHabit(habit.id)}
                 />
+                <div className="task-info">
+                  <span className="task-title">{habit.name}</span>
+                  <div className="task-meta">
+                    <span className="streak">🔥 {habit.streak} day streak</span>
+                  </div>
+                </div>
+                <button onClick={() => deleteHabit(habit.id)}>Delete</button>
               </div>
-            )}
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   )
 }
 
-export default Goals
+export default Habits

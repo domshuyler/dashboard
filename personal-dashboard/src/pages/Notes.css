@@ -1,0 +1,367 @@
+.notes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.notes-header h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.notes-header-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.notes-btn {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-muted);
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.notes-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.notes-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.notes-btn-accent {
+  background-color: var(--color-accent);
+  color: #0f0f0f;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.notes-btn-accent:hover {
+  opacity: 0.85;
+}
+
+.notes-btn-danger {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-muted);
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.notes-btn-danger:hover {
+  border-color: #f87171;
+  color: #f87171;
+}
+
+.notes-filters {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.notes-filters input,
+.notes-filters select {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.notes-filters input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.notes-filters input:focus,
+.notes-filters select:focus {
+  border-color: var(--color-accent);
+}
+
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.notes-empty {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  grid-column: 1 / -1;
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.note-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.note-card:hover {
+  border-color: var(--color-accent);
+}
+
+.note-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.note-card-category {
+  font-size: 0.75rem;
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+.note-card-preview {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.note-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.note-tag {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background-color: var(--color-accent-muted);
+  color: var(--color-accent);
+}
+
+.note-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 800px;
+}
+
+.note-title-input {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text);
+  padding: 0.75rem 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  outline: none;
+  width: 100%;
+}
+
+.note-title-input:focus {
+  border-color: var(--color-accent);
+}
+
+.note-meta-inputs {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.note-meta-inputs input {
+  flex: 1;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.note-meta-inputs input:focus {
+  border-color: var(--color-accent);
+}
+
+.note-editor-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.note-detail {
+  max-width: 800px;
+}
+
+.note-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.note-detail-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 0.35rem;
+}
+
+.note-detail-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.note-content {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  line-height: 1.7;
+  color: var(--color-text);
+  font-size: 0.95rem;
+}
+
+.note-content h1,
+.note-content h2,
+.note-content h3 {
+  color: var(--color-text);
+  margin: 1rem 0 0.5rem;
+}
+
+.note-content p {
+  margin-bottom: 0.75rem;
+}
+
+.note-content ul,
+.note-content ol {
+  margin-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.note-content code {
+  background-color: var(--color-border);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.note-content blockquote {
+  border-left: 3px solid var(--color-accent);
+  padding-left: 1rem;
+  color: var(--color-text-muted);
+  margin: 0.75rem 0;
+}
+
+.notes-ai {
+  max-width: 800px;
+}
+
+.notes-ai-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.notes-ai-header h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.notes-ai-input {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.notes-ai-input input {
+  flex: 1;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.notes-ai-input input:focus {
+  border-color: var(--color-accent);
+}
+
+.notes-ai-loading {
+  color: var(--color-text-muted);
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+.notes-ai-response {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  line-height: 1.7;
+  color: var(--color-text);
+  font-size: 0.95rem;
+}
+
+.notes-ai-response h1,
+.notes-ai-response h2,
+.notes-ai-response h3 {
+  color: var(--color-text);
+  margin: 1rem 0 0.5rem;
+}
+
+.notes-ai-response p {
+  margin-bottom: 0.75rem;
+}
+
+.notes-ai-response ul,
+.notes-ai-response ol {
+  margin-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.w-md-editor {
+  background-color: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 8px !important;
+}
+
+.w-md-editor-toolbar {
+  background-color: var(--color-surface) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+
+.w-md-editor-content {
+  background-color: var(--color-surface) !important;
+}
+
+.w-md-editor-text-pre > code,
+.w-md-editor-text-input {
+  color: var(--color-text) !important;
+}
