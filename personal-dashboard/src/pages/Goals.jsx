@@ -1,8 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './Goals.css'
 
 function Goals() {
-  const [goals, setGoals] = useState([])
+ const [goals, setGoals] = useState(() => {
+  const saved = localStorage.getItem('goals')
+  return saved ? JSON.parse(saved) : []
+})
   const [newGoal, setNewGoal] = useState({
     title: '',
     category: '',
@@ -11,7 +14,9 @@ function Goals() {
     current: 0,
     unit: ''
   })
-
+useEffect(() => {
+  localStorage.setItem('goals', JSON.stringify(goals))
+}, [goals])
   const addGoal = () => {
     if (!newGoal.title.trim()) return
     setGoals([...goals, {

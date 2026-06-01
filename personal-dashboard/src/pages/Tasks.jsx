@@ -1,15 +1,20 @@
 import './Tasks.css'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 function Tasks() {
-  const [tasks, setTasks] = useState([])
+  const [tasks, setTasks] = useState(() => {
+  const saved = localStorage.getItem('tasks')
+  return saved ? JSON.parse(saved) : []
+})
   const [newTask, setNewTask] = useState({
     title: '',
     priority: '',
     dueDate: '',
     category: ''
   })
-
+useEffect(() => {
+  localStorage.setItem('tasks', JSON.stringify(tasks))
+}, [tasks])
   const addTask = () => {
     if (!newTask.title.trim()) return
     setTasks([...tasks, {

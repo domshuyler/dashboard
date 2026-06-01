@@ -1,13 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './Habits.css'
 
 function Habits() {
-  const [habits, setHabits] = useState([])
+const [habits, setHabits] = useState(() => {
+  const saved = localStorage.getItem('habits')
+  return saved ? JSON.parse(saved) : []
+})
   const [newHabit, setNewHabit] = useState({
     name: '',
     category: ''
   })
-
+useEffect(() => {
+  localStorage.setItem('habits', JSON.stringify(habits))
+}, [habits])
   const today = new Date().toISOString().split('T')[0]
 
   const addHabit = () => {
