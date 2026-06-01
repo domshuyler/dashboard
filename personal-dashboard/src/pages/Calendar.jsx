@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useCallback } from 'react'
 import { Calendar as BigCalendar, dateFnsLocalizer } from 'react-big-calendar'
 import { format, parse, startOfWeek, getDay } from 'date-fns'
@@ -28,10 +27,10 @@ function Calendar({ calendarEvents, setCalendarEvents }) {
   }
 
   const logout = useCallback(() => {
-    localStorage.removeItem('google_token')
-    setToken(null)
-    setCalendarEvents([])
-  }, [])
+  localStorage.removeItem('google_token')
+  setToken(null)
+  setCalendarEvents([])
+}, [setCalendarEvents])
 
   const fetchEvents = useCallback(async (accessToken) => {
     setLoading(true)
@@ -80,10 +79,13 @@ function Calendar({ calendarEvents, setCalendarEvents }) {
     } finally {
       setLoading(false)
     }
-  }, [logout])
+  }, [logout, setCalendarEvents])
 
+   
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (token) fetchEvents(token)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
