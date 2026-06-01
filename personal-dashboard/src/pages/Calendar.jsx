@@ -18,8 +18,7 @@ const localizer = dateFnsLocalizer({
   locales: { 'en-US': enUS }
 })
 
-function Calendar() {
-  const [events, setEvents] = useState([])
+function Calendar({ calendarEvents, setCalendarEvents }) {
   const [token, setToken] = useState(() => localStorage.getItem('google_token'))
   const [loading, setLoading] = useState(false)
 
@@ -31,7 +30,7 @@ function Calendar() {
   const logout = useCallback(() => {
     localStorage.removeItem('google_token')
     setToken(null)
-    setEvents([])
+    setCalendarEvents([])
   }, [])
 
   const fetchEvents = useCallback(async (accessToken) => {
@@ -50,32 +49,32 @@ function Calendar() {
 
       const now = new Date().toISOString()
       const allEvents = await Promise.all(
-  calendars.map(cal =>
-    fetch(
-      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?timeMin=${now}&maxResults=50&singleEvents=true&orderBy=startTime`,
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    ).then(res => res.json()).then(data =>
-      (data.items || []).map(event => ({
-        ...event,
-        calendarColor: cal.backgroundColor
-      }))
-    )
-  )
-)
+        calendars.map(cal =>
+          fetch(
+            `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?timeMin=${now}&maxResults=50&singleEvents=true&orderBy=startTime`,
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+          ).then(res => res.json()).then(data =>
+            (data.items || []).map(event => ({
+              ...event,
+              calendarColor: cal.backgroundColor
+            }))
+          )
+        )
+      )
 
       const merged = allEvents.flat()
-  .filter(event => event.start)
-  .map(event => ({
-    id: event.id,
-    title: event.summary || 'No title',
-    start: new Date(event.start.dateTime || event.start.date),
-    end: new Date(event.end.dateTime || event.end.date),
-    location: event.location,
-    color: event.calendarColor
-  }))
-  .sort((a, b) => a.start - b.start)
+        .filter(event => event.start)
+        .map(event => ({
+          id: event.id,
+          title: event.summary || 'No title',
+          start: new Date(event.start.dateTime || event.start.date),
+          end: new Date(event.end.dateTime || event.end.date),
+          location: event.location,
+          color: event.calendarColor
+        }))
+        .sort((a, b) => a.start - b.start)
 
-      setEvents(merged)
+      setCalendarEvents(merged)
     } catch (error) {
       console.error('Error fetching events:', error)
     } finally {
@@ -111,22 +110,22 @@ function Calendar() {
 
       {token && !loading && (
         <BigCalendar
-  localizer={localizer}
-  events={events}
-  startAccessor="start"
-  endAccessor="end"
-  style={{ height: 600 }}
-  eventPropGetter={(event) => ({
-    style: {
-      backgroundColor: event.color || 'var(--color-accent)',
-      color: '#fff',
-      border: 'none',
-      borderRadius: '4px',
-      fontSize: '0.8rem',
-      fontWeight: '500'
-    }
-  })}
-/>
+          localizer={localizer}
+          events={calendarEvents}
+          startAccessor="start"
+          endAccessor="end"
+          style={{ height: 600 }}
+          eventPropGetter={(event) => ({
+            style: {
+              backgroundColor: event.color || 'var(--color-accent)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '0.8rem',
+              fontWeight: '500'
+            }
+          })}
+        />
       )}
     </div>
   )

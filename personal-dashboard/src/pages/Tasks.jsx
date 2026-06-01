@@ -1,20 +1,14 @@
+import { useState } from 'react'
 import './Tasks.css'
-import { useState, useEffect } from 'react'
 
-function Tasks() {
-  const [tasks, setTasks] = useState(() => {
-  const saved = localStorage.getItem('tasks')
-  return saved ? JSON.parse(saved) : []
-})
+function Tasks({ tasks, setTasks }) {
   const [newTask, setNewTask] = useState({
     title: '',
     priority: '',
     dueDate: '',
     category: ''
   })
-useEffect(() => {
-  localStorage.setItem('tasks', JSON.stringify(tasks))
-}, [tasks])
+
   const addTask = () => {
     if (!newTask.title.trim()) return
     setTasks([...tasks, {
@@ -77,23 +71,23 @@ useEffect(() => {
       <div className="task-list">
         {tasks.map(task => (
           <div key={task.id} className="task-item">
-         <input
-          type="checkbox"
-          checked={task.completed}
-          onChange={() => toggleTask(task.id)}
-       />
-        <div className="task-info">
-          <span className="task-title" style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>
-            {task.title}
-          </span>
-          <div className="task-meta">
-            {task.priority && <span className={`priority priority-${task.priority}`}>{task.priority}</span>}
-            {task.dueDate && <span className="due-date">Due: {task.dueDate}</span>}
-            {task.category && <span className="category">{task.category}</span>}
-    </div>
-  </div>
-  <button onClick={() => deleteTask(task.id)}>Delete</button>
-</div>
+            <input
+              type="checkbox"
+              checked={task.completed}
+              onChange={() => toggleTask(task.id)}
+            />
+            <div className="task-info">
+              <span className="task-title" style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>
+                {task.title}
+              </span>
+              <div className="task-meta">
+                {task.priority && <span className={`priority priority-${task.priority}`}>{task.priority}</span>}
+                {task.dueDate && <span className="due-date">Due: {task.dueDate}</span>}
+                {task.category && <span className="category">{task.category}</span>}
+              </div>
+            </div>
+            <button onClick={() => deleteTask(task.id)}>Delete</button>
+          </div>
         ))}
       </div>
     </div>
