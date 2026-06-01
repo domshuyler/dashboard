@@ -1,0 +1,154 @@
+.page {
+  max-width: 800px;
+}
+
+.page h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--color-text);
+}
+
+.task-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.task-form input,
+.task-form select {
+  background-color: var(--color-base);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.task-form input:focus,
+.task-form select:focus {
+  border-color: var(--color-accent);
+}
+
+.task-form input[type="text"] {
+  flex: 1;
+  min-width: 200px;
+}
+
+.task-form button {
+  background-color: var(--color-accent);
+  color: #0f0f0f;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.task-form button:hover {
+  opacity: 0.85;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  transition: border-color 0.15s;
+}
+
+.task-item:hover {
+  border-color: var(--color-accent);
+}
+
+.task-item input[type="checkbox"] {
+  accent-color: var(--color-accent);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.task-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.task-title {
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.task-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.priority {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-transform: capitalize;
+}
+
+.priority-high {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.priority-medium {
+  background-color: rgba(234, 179, 8, 0.15);
+  color: #facc15;
+}
+
+.priority-low {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+}
+
+.due-date,
+.category {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid var(--color-border);
+}
+
+.task-item button {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-muted);
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.task-item button:hover {
+  border-color: #f87171;
+  color: #f87171;
+}
