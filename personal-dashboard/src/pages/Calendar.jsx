@@ -88,6 +88,20 @@ function Calendar({ calendarEvents, setCalendarEvents }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+  const hash = window.location.hash
+  if (hash.includes('access_token')) {
+    const params = new URLSearchParams(hash.substring(1))
+    const accessToken = params.get('access_token')
+    if (accessToken) {
+      localStorage.setItem('google_token', accessToken)
+      setToken(accessToken)
+      window.history.replaceState(null, null, window.location.pathname)
+      fetchEvents(accessToken)
+    }
+  }
+}, [fetchEvents])
+
   return (
     <div className="page calendar-page">
       <div className="calendar-header">
