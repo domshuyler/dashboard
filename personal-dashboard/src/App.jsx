@@ -48,6 +48,17 @@ function App() {
   localStorage.setItem('notes', JSON.stringify(notes))
 }, [notes])
 
+useEffect(() => {
+  const hash = window.location.hash
+  if (hash.includes('access_token')) {
+    const match = hash.match(/access_token=([^&]+)/)
+    if (match) {
+      localStorage.setItem('google_token', match[1])
+      window.history.replaceState(null, null, window.location.pathname)
+    }
+  }
+}, [])
+
   return (
     <BrowserRouter>
       <div className="app">
