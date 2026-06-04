@@ -27,10 +27,10 @@ function Calendar({ calendarEvents, setCalendarEvents }) {
   }
 
   const logout = useCallback(() => {
-  localStorage.removeItem('google_token')
-  setToken(null)
-  setCalendarEvents([])
-}, [setCalendarEvents])
+    localStorage.removeItem('google_token')
+    setToken(null)
+    setCalendarEvents([])
+  }, [setCalendarEvents])
 
   const fetchEvents = useCallback(async (accessToken) => {
     setLoading(true)
@@ -81,26 +81,24 @@ function Calendar({ calendarEvents, setCalendarEvents }) {
     }
   }, [logout, setCalendarEvents])
 
-   
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    const hash = window.location.hash
+    if (hash.includes('access_token')) {
+      const match = hash.match(/access_token=([^&]+)/)
+      if (match) {
+        const accessToken = match[1]
+        localStorage.setItem('google_token', accessToken)
+        setToken(accessToken)
+        window.history.replaceState(null, null, window.location.pathname)
+        fetchEvents(accessToken)
+      }
+    }
+  }, [fetchEvents])
+
+  useEffect(() => {
     if (token) fetchEvents(token)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  useEffect(() => {
-  const hash = window.location.hash
-  if (hash.includes('access_token')) {
-    const params = new URLSearchParams(hash.substring(1))
-    const accessToken = params.get('access_token')
-    if (accessToken) {
-      localStorage.setItem('google_token', accessToken)
-      setToken(accessToken)
-      window.history.replaceState(null, null, window.location.pathname)
-      fetchEvents(accessToken)
-    }
-  }
-}, [fetchEvents])
 
   return (
     <div className="page calendar-page">
