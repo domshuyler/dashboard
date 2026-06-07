@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import './Home.css'
 
-function Home({ tasks, habits, goals, calendarEvents }) {
+function Home({ tasks, habits, goals, calendarEvents, jobs, interviews }) {
   const navigate = useNavigate()
   const today = new Date().toISOString().split('T')[0]
 
@@ -34,6 +34,18 @@ function Home({ tasks, habits, goals, calendarEvents }) {
 
   const habitsCompletedToday = habits.filter(h => h.completedToday).length
   const tasksDueToday = tasks.filter(t => !t.completed && t.dueDate === today).length
+
+  const activeApplications = jobs.filter(j => j.active && !['offer', 'rejected', 'ghosted'].includes(j.status)).length
+
+const upcomingInterviews = interviews.filter(i => {
+  if (!i.date) return false
+  return new Date(i.date) >= new Date()
+}).length
+
+const followUpsDue = jobs.filter(j => {
+  if (!j.nextFollowUp) return false
+  return new Date(j.nextFollowUp) <= new Date()
+}).length
 
   return (
     <div className="page">
@@ -138,7 +150,25 @@ function Home({ tasks, habits, goals, calendarEvents }) {
               </div>
             </div>
           ))}
+          
         </div>
+        <div className="home-stats" style={{ marginBottom: '1rem' }}>
+  <div className="stat-card">
+    <div className="stat-label">Applications</div>
+    <div className="stat-value">{activeApplications}</div>
+    <div className="stat-sub">active</div>
+  </div>
+  <div className="stat-card">
+    <div className="stat-label">Interviews</div>
+    <div className="stat-value">{upcomingInterviews}</div>
+    <div className="stat-sub">upcoming</div>
+  </div>
+  <div className="stat-card">
+    <div className="stat-label">Follow-ups</div>
+    <div className="stat-value">{followUpsDue}</div>
+    <div className="stat-sub">due</div>
+  </div>
+</div>
       </div>
     </div>
   )

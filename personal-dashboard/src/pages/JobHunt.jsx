@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './JobHunt.css'
+import ReactMarkdown from 'react-markdown'
 
 const STAGES = ['saved', 'applied', 'interview', 'final round', 'offer', 'rejected', 'ghosted']
 
@@ -49,7 +50,10 @@ function JobHunt({ jobs, setJobs, companies, setCompanies, interviews, setInterv
   date: '',
   notes: ''
 })
-
+  const [prepJob, setPrepJob] = useState('')
+  const [prepResult, setPrepResult] = useState('')
+  const [prepLoading, setPrepLoading] = useState(false)
+  
   const addJob = () => {
     if (!newJob.role.trim() || !newJob.company.trim()) return
     setJobs([...jobs, { ...newJob, id: Date.now() }])
@@ -81,6 +85,61 @@ const addCorrespondence = () => {
   setShowCorrespondenceForm(false)
 }
 
+const generatePrep = async () => {
+  if (!prepJob) return
+  const job = jobs.find(j => j.id === Number(prepJob))
+  if (!job) return
+
+  setPrepLoading(true)
+  setPrepResult('')
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': import.meta.env.VITE_ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 1000,
+        system: 'You are an expert career coach helping someone prepare for a job interview. Be specific, practical, and encouraging.',
+        messages: [{
+          role: 'user',
+          content: `Please help me prepare for this interview:
+
+Role: ${job.role}
+Company: ${job.company}
+Location: ${job.location || 'Not specified'}
+Work Format: ${job.workFormat || 'Not specified'}
+Salary: ${job.salary || 'Not specified'}
+
+Job Description:
+${job.jobDescription || 'Not provided'}
+
+My Notes:
+${job.notes || 'None'}
+
+Please provide:
+1. 8-10 likely interview questions for this role
+2. Key talking points and how to position myself
+3. Questions I should ask the interviewer
+4. A brief company research checklist
+5. A follow-up email template`
+        }]
+      })
+    })
+    const data = await response.json()
+    setPrepResult(data.content[0].text)
+  } catch (error) {
+    console.error('Error:', error)
+  } finally {
+    setPrepLoading(false)
+  }
+}
+
   return (
     <div className="page">
       <div className="jh-header">
@@ -96,6 +155,7 @@ const addCorrespondence = () => {
         <button className={view === 'interviews' ? 'jh-tab active' : 'jh-tab'} onClick={() => setView('interviews')}>Interviews</button>
         <button className={view === 'correspondence' ? 'jh-tab active' : 'jh-tab'} onClick={() => setView('correspondence')}>Correspondence</button>
         <button className={view === 'resources' ? 'jh-tab active' : 'jh-tab'} onClick={() => setView('resources')}>Resources</button>
+        <button className={view === 'prep' ? 'jh-tab active' : 'jh-tab'} onClick={() => setView('prep')}>Interview Prep</button>
       </div>
 
       {showForm && (
@@ -234,6 +294,56 @@ const addCorrespondence = () => {
               <div className="jh-detail-text">{activeJob.notes}</div>
             </div>
           )}
+            <div className="jh-detail-section">
+  <div className="jh-detail-section-title">Interviews</div>
+  {interviews.filter(i => i.jobId === activeJob.id).length === 0 && (
+    <div className="jh-card-meta">No interviews logged for this application.</div>
+  )}
+  {interviews.filter(i => i.jobId === activeJob.id).map(interview => (
+    <div key={interview.id} className="jh-interview-card" style={{ marginBottom: '0.5rem' }}>
+      <div className="jh-interview-header">
+        <div>
+          <div className="jh-card-role">{interview.type || 'Interview'}</div>
+          <div className="jh-card-meta">{interview.date}</div>
+        </div>
+        <div className="jh-interview-meta">
+          {interview.outcome && (
+            <span className={`jh-status ${interview.outcome === 'Passed' ? 'jh-status-offer' : interview.outcome === 'Rejected' ? 'jh-status-rejected' : 'jh-status-saved'}`}>
+              {interview.outcome}
+            </span>
+          )}
+        </div>
+      </div>
+      {interview.prepNotes && (
+        <div className="jh-detail-text" style={{ marginTop: '0.5rem', fontSize: '0.85rem' }}>
+          {interview.prepNotes}
+        </div>
+      )}
+    </div>
+  ))}
+</div>
+
+<div className="jh-detail-section">
+  <div className="jh-detail-section-title">Correspondence</div>
+  {correspondence.filter(c => c.jobId === activeJob.id).length === 0 && (
+    <div className="jh-card-meta">No correspondence logged for this application.</div>
+  )}
+  {correspondence.filter(c => c.jobId === activeJob.id).map(c => (
+    <div key={c.id} className="jh-interview-card" style={{ marginBottom: '0.5rem' }}>
+      <div className="jh-interview-header">
+        <div>
+          <div className="jh-card-role">{c.contact || 'Unknown contact'}</div>
+          <div className="jh-card-meta">{c.type} · {c.date}</div>
+        </div>
+      </div>
+      {c.notes && (
+        <div className="jh-detail-text" style={{ marginTop: '0.5rem', fontSize: '0.85rem' }}>
+          {c.notes}
+        </div>
+      )}
+    </div>
+  ))}
+</div>
         </div>
       )}
 
@@ -385,6 +495,35 @@ const addCorrespondence = () => {
                 {resource.name} →
               </a>
             ))}
+            {view === 'prep' && (
+  <div className="jh-prep">
+    <div className="jh-section-header">
+      <div className="jh-prep-controls">
+        <select value={prepJob} onChange={e => { setPrepJob(e.target.value); setPrepResult('') }}>
+          <option value="">Select an application to prep for...</option>
+          {jobs.map(j => <option key={j.id} value={j.id}>{j.role} @ {j.company}</option>)}
+        </select>
+        <button className="notes-btn-accent" onClick={generatePrep} disabled={!prepJob || prepLoading}>
+          {prepLoading ? 'Generating...' : 'Generate Prep Guide'}
+        </button>
+      </div>
+    </div>
+
+    {prepLoading && (
+      <div className="notes-empty">Generating your interview prep guide...</div>
+    )}
+
+    {prepResult && (
+      <div className="jh-prep-result">
+        <ReactMarkdown>{prepResult}</ReactMarkdown>
+      </div>
+    )}
+
+    {!prepJob && !prepResult && (
+      <div className="notes-empty">Select a job application above to generate a personalized interview prep guide.</div>
+    )}
+  </div>
+)}
           </div>
         </div>
       )}

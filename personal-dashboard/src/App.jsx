@@ -117,13 +117,15 @@ useEffect(() => {
         <main className="main-content">
           <Routes>
             <Route path="/" element={
-              <Home
-                tasks={tasks}
-                habits={habits}
-                goals={goals}
-                calendarEvents={calendarEvents}
-              />}
-            />
+  <Home
+    tasks={tasks}
+    habits={habits}
+    goals={goals}
+    calendarEvents={calendarEvents}
+    jobs={jobs}
+    interviews={interviews}
+  />}
+/>
             <Route path="/tasks" element={
               <Tasks tasks={tasks} setTasks={setTasks} />}
             />
