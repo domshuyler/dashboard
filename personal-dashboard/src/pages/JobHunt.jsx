@@ -54,6 +54,8 @@ function JobHunt({ jobs, setJobs, companies, setCompanies, interviews, setInterv
   const [prepJob, setPrepJob] = useState('')
   const [prepResult, setPrepResult] = useState('')
   const [prepLoading, setPrepLoading] = useState(false)
+  const [editMode, setEditMode] = useState(false)
+  const [editJob, setEditJob] = useState(null)
 
   const addJob = async () => {
     if (!newJob.role.trim() || !newJob.company.trim()) return
@@ -103,6 +105,35 @@ function JobHunt({ jobs, setJobs, companies, setCompanies, interviews, setInterv
     }
   }
 
+  const saveJobEdit = async () => {
+  const updated = {
+    role: editJob.role,
+    company: editJob.company,
+    post_url: editJob.postUrl,
+    direct_application_url: editJob.directApplicationUrl,
+    location: editJob.location,
+    work_format: editJob.workFormat,
+    employment_type: editJob.employmentType,
+    date_posted: editJob.datePosted,
+    application_deadline: editJob.applicationDeadline,
+    salary: editJob.salary,
+    status: editJob.status,
+    date_applied: editJob.dateApplied,
+    active: editJob.active,
+    next_follow_up: editJob.nextFollowUp,
+    contact_person: editJob.contactPerson,
+    contact_details: editJob.contactDetails,
+    job_description: editJob.jobDescription,
+    notes: editJob.notes,
+    source: editJob.source
+  }
+  const { error } = await supabase.from('jobs').update(updated).eq('id', editJob.id)
+  if (!error) {
+    setJobs(jobs.map(j => j.id === editJob.id ? editJob : j))
+    setActiveJob(editJob)
+    setEditMode(false)
+  }
+}
   const addInterview = async () => {
     if (!newInterview.company.trim()) return
     const interview = {
@@ -336,21 +367,70 @@ Please provide:
               <div className="jh-detail-company">{activeJob.company}</div>
             </div>
             <div className="jh-detail-actions">
-              <select
-                value={activeJob.status}
-                onChange={e => {
-                  const updated = { ...activeJob, status: e.target.value }
-                  setActiveJob(updated)
-                  updateJobStatus(activeJob.id, e.target.value)
-                }}
-              >
-                {STAGES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
-              </select>
-              <button className="notes-btn-danger" onClick={() => deleteJob(activeJob.id)}>Delete</button>
-              <button className="notes-btn" onClick={() => setView('kanban')}>Back</button>
-            </div>
+  <button className="notes-btn" onClick={() => { setEditJob({ ...activeJob }); setEditMode(true) }}>Edit</button>
+  <select
+    value={activeJob.status}
+    onChange={e => {
+      const updated = { ...activeJob, status: e.target.value }
+      setActiveJob(updated)
+      updateJobStatus(activeJob.id, e.target.value)
+    }}
+  >
+    {STAGES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+  </select>
+  <button className="notes-btn-danger" onClick={() => deleteJob(activeJob.id)}>Delete</button>
+  <button className="notes-btn" onClick={() => setView('kanban')}>Back</button>
+</div>
           </div>
-
+{editMode && editJob && (
+  <div className="jh-form" style={{ marginBottom: '1.5rem' }}>
+    <div className="jh-form-grid">
+      <input placeholder="Role / Opportunity *" value={editJob.role} onChange={e => setEditJob({ ...editJob, role: e.target.value })} />
+      <input placeholder="Company *" value={editJob.company} onChange={e => setEditJob({ ...editJob, company: e.target.value })} />
+      <input placeholder="Post URL" value={editJob.postUrl || ''} onChange={e => setEditJob({ ...editJob, postUrl: e.target.value })} />
+      <input placeholder="Direct Application URL" value={editJob.directApplicationUrl || ''} onChange={e => setEditJob({ ...editJob, directApplicationUrl: e.target.value })} />
+      <input placeholder="Location" value={editJob.location || ''} onChange={e => setEditJob({ ...editJob, location: e.target.value })} />
+      <select value={editJob.workFormat || ''} onChange={e => setEditJob({ ...editJob, workFormat: e.target.value })}>
+        <option value="">Work Format</option>
+        <option>Remote</option>
+        <option>Hybrid</option>
+        <option>Onsite</option>
+      </select>
+      <select value={editJob.employmentType || ''} onChange={e => setEditJob({ ...editJob, employmentType: e.target.value })}>
+        <option value="">Employment Type</option>
+        <option>Full-time</option>
+        <option>Part-time</option>
+        <option>Contract</option>
+      </select>
+      <input placeholder="Salary / Comp" value={editJob.salary || ''} onChange={e => setEditJob({ ...editJob, salary: e.target.value })} />
+      <input placeholder="Source" value={editJob.source || ''} onChange={e => setEditJob({ ...editJob, source: e.target.value })} />
+      <div className="jh-date-field">
+        <label>Date Posted</label>
+        <input type="date" value={editJob.datePosted || ''} onChange={e => setEditJob({ ...editJob, datePosted: e.target.value })} />
+      </div>
+      <div className="jh-date-field">
+        <label>Application Deadline</label>
+        <input type="date" value={editJob.applicationDeadline || ''} onChange={e => setEditJob({ ...editJob, applicationDeadline: e.target.value })} />
+      </div>
+      <div className="jh-date-field">
+        <label>Date Applied</label>
+        <input type="date" value={editJob.dateApplied || ''} onChange={e => setEditJob({ ...editJob, dateApplied: e.target.value })} />
+      </div>
+      <div className="jh-date-field">
+        <label>Next Follow-Up</label>
+        <input type="date" value={editJob.nextFollowUp || ''} onChange={e => setEditJob({ ...editJob, nextFollowUp: e.target.value })} />
+      </div>
+      <input placeholder="Contact Person / Recruiter" value={editJob.contactPerson || ''} onChange={e => setEditJob({ ...editJob, contactPerson: e.target.value })} />
+      <input placeholder="Contact Details" value={editJob.contactDetails || ''} onChange={e => setEditJob({ ...editJob, contactDetails: e.target.value })} />
+    </div>
+    <textarea placeholder="Job Description" value={editJob.jobDescription || ''} onChange={e => setEditJob({ ...editJob, jobDescription: e.target.value })} rows={4} />
+    <textarea placeholder="Notes" value={editJob.notes || ''} onChange={e => setEditJob({ ...editJob, notes: e.target.value })} rows={3} />
+    <div style={{ display: 'flex', gap: '0.75rem' }}>
+      <button className="notes-btn-accent" onClick={saveJobEdit}>Save Changes</button>
+      <button className="notes-btn" onClick={() => setEditMode(false)}>Cancel</button>
+    </div>
+  </div>
+)}
           <div className="jh-detail-grid">
             {activeJob.location && <div className="jh-detail-field"><span>Location</span><p>{activeJob.location}</p></div>}
             {activeJob.workFormat && <div className="jh-detail-field"><span>Work Format</span><p>{activeJob.workFormat}</p></div>}

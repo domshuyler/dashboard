@@ -51,6 +51,14 @@ function Finance({ transactions, setTransactions, budgets, setBudgets, accounts,
   const netSavings = totalIncome - totalExpenses
   const totalBalance = accounts.reduce((sum, a) => sum + Number(a.balance), 0)
 
+  const totalBudget = budgets
+    .filter(b => b.month === selectedMonth)
+    .reduce((sum, b) => sum + Number(b.limit), 0)
+
+  const totalRemaining = totalBudget - totalExpenses
+
+  const allTimeBudget = budgets.reduce((sum, b) => sum + Number(b.limit), 0)
+
   const expensesByCategory = EXPENSE_CATEGORIES.map(cat => ({
     category: cat,
     spent: monthlyExpenses.filter(t => t.category === cat).reduce((sum, t) => sum + Number(t.amount), 0),
@@ -160,7 +168,7 @@ function Finance({ transactions, setTransactions, budgets, setBudgets, accounts,
 
       {view === 'dashboard' && (
         <div className="finance-dashboard">
-          <div className="home-stats" style={{ marginBottom: '1rem' }}>
+          <div className="finance-stats">
             <div className="stat-card">
               <div className="stat-label">Income</div>
               <div className="stat-value" style={{ color: '#4ade80' }}>${totalIncome.toFixed(2)}</div>
@@ -180,6 +188,21 @@ function Finance({ transactions, setTransactions, budgets, setBudgets, accounts,
               <div className="stat-label">Total Balance</div>
               <div className="stat-value">${totalBalance.toFixed(2)}</div>
               <div className="stat-sub">across all accounts</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">Total Budget</div>
+              <div className="stat-value">${totalBudget.toFixed(2)}</div>
+              <div className="stat-sub">this month</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">Remaining</div>
+              <div className="stat-value" style={{ color: totalRemaining >= 0 ? '#4ade80' : '#f87171' }}>${totalRemaining.toFixed(2)}</div>
+              <div className="stat-sub">of budget</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">All Budgets</div>
+              <div className="stat-value">${allTimeBudget.toFixed(2)}</div>
+              <div className="stat-sub">across all months</div>
             </div>
           </div>
 
