@@ -351,10 +351,22 @@ Please provide:
             {activeJob.employmentType && <div className="jh-detail-field"><span>Employment Type</span><p>{activeJob.employmentType}</p></div>}
             {activeJob.salary && <div className="jh-detail-field"><span>Salary</span><p>{activeJob.salary}</p></div>}
             {activeJob.source && <div className="jh-detail-field"><span>Source</span><p>{activeJob.source}</p></div>}
-            {activeJob.datePosted && <div className="jh-detail-field"><span>Date Posted</span><p>{activeJob.datePosted}</p></div>}
-            {activeJob.applicationDeadline && <div className="jh-detail-field"><span>Deadline</span><p>{activeJob.applicationDeadline}</p></div>}
-            {activeJob.dateApplied && <div className="jh-detail-field"><span>Date Applied</span><p>{activeJob.dateApplied}</p></div>}
-            {activeJob.nextFollowUp && <div className="jh-detail-field"><span>Next Follow-Up</span><p>{activeJob.nextFollowUp}</p></div>}
+           <div className="jh-date-field">
+  <label>Date Posted</label>
+  <input type="date" value={newJob.datePosted} onChange={e => setNewJob({ ...newJob, datePosted: e.target.value })} />
+</div>
+<div className="jh-date-field">
+  <label>Application Deadline</label>
+  <input type="date" value={newJob.applicationDeadline} onChange={e => setNewJob({ ...newJob, applicationDeadline: e.target.value })} />
+</div>
+<div className="jh-date-field">
+  <label>Date Applied</label>
+  <input type="date" value={newJob.dateApplied} onChange={e => setNewJob({ ...newJob, dateApplied: e.target.value })} />
+</div>
+<div className="jh-date-field">
+  <label>Next Follow-Up</label>
+  <input type="date" value={newJob.nextFollowUp} onChange={e => setNewJob({ ...newJob, nextFollowUp: e.target.value })} />
+</div>
             {activeJob.contactPerson && <div className="jh-detail-field"><span>Contact</span><p>{activeJob.contactPerson}</p></div>}
             {activeJob.contactDetails && <div className="jh-detail-field"><span>Contact Details</span><p>{activeJob.contactDetails}</p></div>}
             {activeJob.postUrl && <div className="jh-detail-field"><span>Post URL</span><p><a href={activeJob.postUrl} target="_blank" rel="noreferrer">{activeJob.postUrl}</a></p></div>}

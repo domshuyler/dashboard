@@ -444,3 +444,29 @@
 .jh-prep-result strong {
   color: var(--color-accent);
 }
+.jh-date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.jh-date-field label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.jh-date-field input {
+  background-color: var(--color-base);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  outline: none;
+  width: 100%;
+}
+
+.jh-date-field input:focus {
+  border-color: var(--color-accent);
+}
