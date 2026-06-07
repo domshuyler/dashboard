@@ -11,6 +11,7 @@ import Chat from './pages/Chat'
 import Notes from './pages/Notes'
 import JobHunt from './pages/JobHunt'
 import Finance from './pages/Finance'
+import Projects from './pages/Projects'
 
 function App() {
   const [tasks, setTasks] = useState([])
@@ -27,6 +28,7 @@ function App() {
   const [savingsGoals, setSavingsGoals] = useState([])
   const [loading, setLoading] = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [projects, setProjects] = useState([])
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -41,7 +43,8 @@ function App() {
         { data: transactionsData },
         { data: budgetsData },
         { data: accountsData },
-        { data: savingsGoalsData }
+        { data: savingsGoalsData },
+        { data: projectsData },
       ] = await Promise.all([
         supabase.from('tasks').select('*'),
         supabase.from('habits').select('*'),
@@ -53,7 +56,8 @@ function App() {
         supabase.from('transactions').select('*'),
         supabase.from('budgets').select('*'),
         supabase.from('accounts').select('*'),
-        supabase.from('savings_goals').select('*')
+        supabase.from('savings_goals').select('*'),
+        supabase.from('projects').select('*'),
       ])
 
       if (tasksData) setTasks(tasksData.map(t => ({
@@ -114,6 +118,14 @@ function App() {
       if (savingsGoalsData) setSavingsGoals(savingsGoalsData.map(s => ({
         id: s.id, title: s.title, target: s.target, current: s.current, deadline: s.deadline
       })))
+      if (projectsData) setProjects(projectsData.map(p => ({
+  id: p.id,
+  name: p.name,
+  description: p.description,
+  status: p.status,
+  deadline: p.deadline,
+  notes: p.notes
+})))
 
       setLoading(false)
     }
@@ -157,6 +169,7 @@ function App() {
             <NavLink to="/notes" onClick={() => setSidebarOpen(false)}>Notes</NavLink>
             <NavLink to="/jobs" onClick={() => setSidebarOpen(false)}>Job Hunt</NavLink>
             <NavLink to="/finance" onClick={() => setSidebarOpen(false)}>Finance</NavLink>
+            <NavLink to="/projects" onClick={() => setSidebarOpen(false)}>Projects</NavLink>
           </nav>
         </aside>
         <div className="main-wrapper">
@@ -215,6 +228,13 @@ function App() {
                   setSavingsGoals={setSavingsGoals}
                 />}
               />
+              <Route path="/projects" element={
+  <Projects
+    projects={projects}
+    setProjects={setProjects}
+    tasks={tasks}
+  />}
+/>
             </Routes>
           </main>
         </div>
