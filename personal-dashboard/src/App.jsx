@@ -8,6 +8,7 @@ import Goals from './pages/Goals'
 import Calendar from './pages/Calendar'
 import Chat from './pages/Chat'
 import Notes from './pages/Notes'
+import JobHunt from './pages/JobHunt'
 
 function App() {
   const [tasks, setTasks] = useState(() => {
@@ -24,6 +25,16 @@ function App() {
     const saved = localStorage.getItem('goals')
     return saved ? JSON.parse(saved) : []
   })
+
+  const [jobs, setJobs] = useState(() => {
+  const saved = localStorage.getItem('jobs')
+  return saved ? JSON.parse(saved) : []
+})
+
+const [companies, setCompanies] = useState(() => {
+  const saved = localStorage.getItem('companies')
+  return saved ? JSON.parse(saved) : []
+})
 
   const [notes, setNotes] = useState(() => {
   const saved = localStorage.getItem('notes')
@@ -48,6 +59,7 @@ function App() {
   localStorage.setItem('notes', JSON.stringify(notes))
 }, [notes])
 
+
 useEffect(() => {
   const hash = window.location.hash
   if (hash.includes('access_token')) {
@@ -58,6 +70,14 @@ useEffect(() => {
     }
   }
 }, [])
+
+useEffect(() => {
+  localStorage.setItem('jobs', JSON.stringify(jobs))
+}, [jobs])
+
+useEffect(() => {
+  localStorage.setItem('companies', JSON.stringify(companies))
+}, [companies])
 
   return (
     <BrowserRouter>
@@ -72,6 +92,7 @@ useEffect(() => {
             <NavLink to="/calendar">Calendar</NavLink>
             <NavLink to="/chat">Chat</NavLink>
             <NavLink to="/notes">Notes</NavLink>
+            <NavLink to="/jobs">Job Hunt</NavLink>
           </nav>
         </aside>
         <main className="main-content">
@@ -99,6 +120,10 @@ useEffect(() => {
             <Route path="/chat" element={<Chat />} />
 
             <Route path="/notes" element={<Notes notes={notes} setNotes={setNotes} />} />
+            <Route path="/jobs" element={
+  <JobHunt jobs={jobs} setJobs={setJobs} companies={companies} setCompanies={setCompanies} />}
+/>
+            
           </Routes>
         </main>
       </div>
