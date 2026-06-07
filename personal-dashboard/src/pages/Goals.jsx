@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './Goals.css'
+import { supabase } from '../supabase'
 
 function Goals() {
  const [goals, setGoals] = useState(() => {
@@ -14,43 +15,47 @@ function Goals() {
     current: 0,
     unit: ''
   })
-useEffect(() => {
-  localStorage.setItem('goals', JSON.stringify(goals))
-}, [goals])
-  const addGoal = () => {
-    if (!newGoal.title.trim()) return
-    setGoals([...goals, {
-      ...newGoal,
-      id: Date.now(),
-      completed: false,
-      target: newGoal.target ? Number(newGoal.target) : null,
-      current: 0
-    }])
-    setNewGoal({
-      title: '',
-      category: '',
-      deadline: '',
-      target: '',
-      current: 0,
-      unit: ''
-    })
-  }
 
-  const updateProgress = (id, value) => {
-    setGoals(goals.map(goal => {
-      if (goal.id !== id) return goal
-      const newCurrent = Math.min(Number(value), goal.target)
-      return {
-        ...goal,
-        current: newCurrent,
-        completed: newCurrent >= goal.target
-      }
-    }))
+  const addGoal = async () => {
+  if (!newGoal.title.trim()) return
+  const goal = {
+    id: Date.now(),
+    title: newGoal.title,
+    category: newGoal.category,
+    deadline: newGoal.deadline,
+    target: newGoal.target ? Number(newGoal.target) : null,
+    current: 0,
+    unit: newGoal.unit,
+    completed: false
   }
+  const { error } = await supabase.from('goals').insert(goal)
+  if (!error) {
+    setGoals([...goals, goal])
+  }
+  setNewGoal({ title: '', category: '', deadline: '', target: '', current: 0, unit: '' })
+}
 
-  const deleteGoal = (id) => {
-    setGoals(goals.filter(goal => goal.id !== id))
+const updateProgress = async (id, value) => {
+  const goal = goals.find(g => g.id === id)
+  const newCurrent = Math.min(Number(value), goal.target)
+  const completed = newCurrent >= goal.target
+
+  const { error } = await supabase
+    .from('goals')
+    .update({ current: newCurrent, completed })
+    .eq('id', id)
+
+  if (!error) {
+    setGoals(goals.map(g => g.id === id ? { ...g, current: newCurrent, completed } : g))
   }
+}
+
+const deleteGoal = async (id) => {
+  const { error } = await supabase.from('goals').delete().eq('id', id)
+  if (!error) {
+    setGoals(goals.filter(g => g.id !== id))
+  }
+}
 
   const getProgress = (goal) => {
     if (!goal.target) return null

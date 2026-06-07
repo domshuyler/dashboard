@@ -1,6 +1,7 @@
 import './App.css'
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { supabase } from './supabase'
 import Home from './pages/Home'
 import Tasks from './pages/Tasks'
 import Habits from './pages/Habits'
@@ -11,92 +12,131 @@ import Notes from './pages/Notes'
 import JobHunt from './pages/JobHunt'
 
 function App() {
-  const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('tasks')
-    return saved ? JSON.parse(saved) : []
-  })
-
-  const [habits, setHabits] = useState(() => {
-  const saved = localStorage.getItem('habits')
-  return saved ? JSON.parse(saved) : []
-})
-
-  const [goals, setGoals] = useState(() => {
-    const saved = localStorage.getItem('goals')
-    return saved ? JSON.parse(saved) : []
-  })
-
-  const [jobs, setJobs] = useState(() => {
-  const saved = localStorage.getItem('jobs')
-  return saved ? JSON.parse(saved) : []
-})
-
-const [interviews, setInterviews] = useState(() => {
-  const saved = localStorage.getItem('interviews')
-  return saved ? JSON.parse(saved) : []
-})
-
-const [correspondence, setCorrespondence] = useState(() => {
-  const saved = localStorage.getItem('correspondence')
-  return saved ? JSON.parse(saved) : []
-})
-
-const [companies, setCompanies] = useState(() => {
-  const saved = localStorage.getItem('companies')
-  return saved ? JSON.parse(saved) : []
-})
-
-  const [notes, setNotes] = useState(() => {
-  const saved = localStorage.getItem('notes')
-  return saved ? JSON.parse(saved) : []
-})
-
+  const [tasks, setTasks] = useState([])
+  const [habits, setHabits] = useState([])
+  const [goals, setGoals] = useState([])
+  const [notes, setNotes] = useState([])
+  const [jobs, setJobs] = useState([])
+  const [interviews, setInterviews] = useState([])
+  const [correspondence, setCorrespondence] = useState([])
   const [calendarEvents, setCalendarEvents] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify(tasks))
-  }, [tasks])
+    const fetchAll = async () => {
+      const [
+        { data: tasksData },
+        { data: habitsData },
+        { data: goalsData },
+        { data: notesData },
+        { data: jobsData },
+        { data: interviewsData },
+        { data: correspondenceData }
+      ] = await Promise.all([
+        supabase.from('tasks').select('*'),
+        supabase.from('habits').select('*'),
+        supabase.from('goals').select('*'),
+        supabase.from('notes').select('*'),
+        supabase.from('jobs').select('*'),
+        supabase.from('interviews').select('*'),
+        supabase.from('correspondence').select('*')
+      ])
 
-  useEffect(() => {
-    localStorage.setItem('habits', JSON.stringify(habits))
-  }, [habits])
+      if (tasksData) setTasks(tasksData.map(t => ({
+        id: t.id,
+        title: t.title,
+        completed: t.completed,
+        priority: t.priority,
+        dueDate: t.due_date,
+        category: t.category
+      })))
 
-  useEffect(() => {
-    localStorage.setItem('goals', JSON.stringify(goals))
-  }, [goals])
+      if (habitsData) setHabits(habitsData.map(h => ({
+        id: h.id,
+        name: h.name,
+        category: h.category,
+        streak: h.streak,
+        lastCompleted: h.last_completed,
+        completedToday: h.completed_today
+      })))
 
-  useEffect(() => {
-  localStorage.setItem('notes', JSON.stringify(notes))
-}, [notes])
+      if (goalsData) setGoals(goalsData.map(g => ({
+        id: g.id,
+        title: g.title,
+        category: g.category,
+        deadline: g.deadline,
+        target: g.target,
+        current: g.current,
+        unit: g.unit,
+        completed: g.completed
+      })))
 
+      if (notesData) setNotes(notesData.map(n => ({
+        id: n.id,
+        title: n.title,
+        content: n.content,
+        category: n.category,
+        tags: n.tags || [],
+        createdAt: n.created_at
+      })))
 
-useEffect(() => {
-  const hash = window.location.hash
-  if (hash.includes('access_token')) {
-    const match = hash.match(/access_token=([^&]+)/)
-    if (match) {
-      localStorage.setItem('google_token', match[1])
-      window.history.replaceState(null, null, window.location.pathname)
+      if (jobsData) setJobs(jobsData.map(j => ({
+        id: j.id,
+        role: j.role,
+        company: j.company,
+        postUrl: j.post_url,
+        directApplicationUrl: j.direct_application_url,
+        location: j.location,
+        workFormat: j.work_format,
+        employmentType: j.employment_type,
+        datePosted: j.date_posted,
+        applicationDeadline: j.application_deadline,
+        salary: j.salary,
+        status: j.status,
+        dateApplied: j.date_applied,
+        active: j.active,
+        nextFollowUp: j.next_follow_up,
+        contactPerson: j.contact_person,
+        contactDetails: j.contact_details,
+        jobDescription: j.job_description,
+        notes: j.notes,
+        source: j.source
+      })))
+
+      if (interviewsData) setInterviews(interviewsData.map(i => ({
+        id: i.id,
+        jobId: i.job_id,
+        company: i.company,
+        role: i.role,
+        date: i.date,
+        type: i.type,
+        prepNotes: i.prep_notes,
+        outcome: i.outcome
+      })))
+
+      if (correspondenceData) setCorrespondence(correspondenceData.map(c => ({
+        id: c.id,
+        jobId: c.job_id,
+        company: c.company,
+        contact: c.contact,
+        type: c.type,
+        date: c.date,
+        notes: c.notes
+      })))
+
+      setLoading(false)
     }
+
+    fetchAll()
+  }, [])
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'var(--color-text-muted)' }}>
+        Loading...
+      </div>
+    )
   }
-}, [])
-
-useEffect(() => {
-  localStorage.setItem('jobs', JSON.stringify(jobs))
-}, [jobs])
-
-useEffect(() => {
-  localStorage.setItem('companies', JSON.stringify(companies))
-}, [companies])
-
-useEffect(() => {
-  localStorage.setItem('interviews', JSON.stringify(interviews))
-}, [interviews])
-
-useEffect(() => {
-  localStorage.setItem('correspondence', JSON.stringify(correspondence))
-}, [correspondence])
-
 
   return (
     <BrowserRouter>
@@ -117,15 +157,15 @@ useEffect(() => {
         <main className="main-content">
           <Routes>
             <Route path="/" element={
-  <Home
-    tasks={tasks}
-    habits={habits}
-    goals={goals}
-    calendarEvents={calendarEvents}
-    jobs={jobs}
-    interviews={interviews}
-  />}
-/>
+              <Home
+                tasks={tasks}
+                habits={habits}
+                goals={goals}
+                calendarEvents={calendarEvents}
+                jobs={jobs}
+                interviews={interviews}
+              />}
+            />
             <Route path="/tasks" element={
               <Tasks tasks={tasks} setTasks={setTasks} />}
             />
@@ -139,21 +179,21 @@ useEffect(() => {
               <Calendar calendarEvents={calendarEvents} setCalendarEvents={setCalendarEvents} />}
             />
             <Route path="/chat" element={<Chat />} />
-
-            <Route path="/notes" element={<Notes notes={notes} setNotes={setNotes} />} />
+            <Route path="/notes" element={
+              <Notes notes={notes} setNotes={setNotes} />}
+            />
             <Route path="/jobs" element={
-             <JobHunt
-               jobs={jobs}
-               setJobs={setJobs}
-               companies={companies}
-               setCompanies={setCompanies}
-               interviews={interviews}
-               setInterviews={setInterviews}
-               correspondence={correspondence}
-               setCorrespondence={setCorrespondence}
-  />}
-/>
-            
+              <JobHunt
+                jobs={jobs}
+                setJobs={setJobs}
+                companies={[]}
+                setCompanies={() => {}}
+                interviews={interviews}
+                setInterviews={setInterviews}
+                correspondence={correspondence}
+                setCorrespondence={setCorrespondence}
+              />}
+            />
           </Routes>
         </main>
       </div>

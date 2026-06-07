@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './JobHunt.css'
 import ReactMarkdown from 'react-markdown'
+import { supabase } from '../supabase'
 
 const STAGES = ['saved', 'applied', 'interview', 'final round', 'offer', 'rejected', 'ghosted']
 
@@ -54,33 +55,112 @@ function JobHunt({ jobs, setJobs, companies, setCompanies, interviews, setInterv
   const [prepResult, setPrepResult] = useState('')
   const [prepLoading, setPrepLoading] = useState(false)
   
-  const addJob = () => {
-    if (!newJob.role.trim() || !newJob.company.trim()) return
-    setJobs([...jobs, { ...newJob, id: Date.now() }])
-    setNewJob(EMPTY_JOB)
-    setShowForm(false)
+const addJob = async () => {
+  if (!newJob.role.trim() || !newJob.company.trim()) return
+  const job = {
+    id: Date.now(),
+    role: newJob.role,
+    company: newJob.company,
+    post_url: newJob.postUrl,
+    direct_application_url: newJob.directApplicationUrl,
+    location: newJob.location,
+    work_format: newJob.workFormat,
+    employment_type: newJob.employmentType,
+    date_posted: newJob.datePosted,
+    application_deadline: newJob.applicationDeadline,
+    salary: newJob.salary,
+    status: newJob.status,
+    date_applied: newJob.dateApplied,
+    active: newJob.active,
+    next_follow_up: newJob.nextFollowUp,
+    contact_person: newJob.contactPerson,
+    contact_details: newJob.contactDetails,
+    job_description: newJob.jobDescription,
+    notes: newJob.notes,
+    source: newJob.source
   }
+  const { error } = await supabase.from('jobs').insert(job)
+  if (!error) {
+    setJobs([...jobs, {
+      ...newJob,
+      id: job.id
+    }])
+  }
+  setNewJob(EMPTY_JOB)
+  setShowForm(false)
+}
 
-  const updateJobStatus = (id, status) => {
+const updateJobStatus = async (id, status) => {
+  const { error } = await supabase
+    .from('jobs')
+    .update({ status })
+    .eq('id', id)
+  if (!error) {
     setJobs(jobs.map(j => j.id === id ? { ...j, status } : j))
   }
+}
 
-  const deleteJob = (id) => {
+const deleteJob = async (id) => {
+  const { error } = await supabase.from('jobs').delete().eq('id', id)
+  if (!error) {
     setJobs(jobs.filter(j => j.id !== id))
     setActiveJob(null)
     setView('kanban')
   }
+}
 
-  const addInterview = () => {
+const addInterview = async () => {
   if (!newInterview.company.trim()) return
-  setInterviews([...interviews, { ...newInterview, id: Date.now() }])
+  const interview = {
+    id: Date.now(),
+    job_id: newInterview.jobId,
+    company: newInterview.company,
+    role: newInterview.role,
+    date: newInterview.date,
+    type: newInterview.type,
+    prep_notes: newInterview.prepNotes,
+    outcome: newInterview.outcome
+  }
+  const { error } = await supabase.from('interviews').insert(interview)
+  if (!error) {
+    setInterviews([...interviews, {
+      id: interview.id,
+      jobId: interview.job_id,
+      company: interview.company,
+      role: interview.role,
+      date: interview.date,
+      type: interview.type,
+      prepNotes: interview.prep_notes,
+      outcome: interview.outcome
+    }])
+  }
   setNewInterview({ jobId: null, company: '', role: '', date: '', type: '', prepNotes: '', outcome: '' })
   setShowInterviewForm(false)
 }
 
-const addCorrespondence = () => {
+const addCorrespondence = async () => {
   if (!newCorrespondence.company.trim()) return
-  setCorrespondence([...correspondence, { ...newCorrespondence, id: Date.now() }])
+  const entry = {
+    id: Date.now(),
+    job_id: newCorrespondence.jobId,
+    company: newCorrespondence.company,
+    contact: newCorrespondence.contact,
+    type: newCorrespondence.type,
+    date: newCorrespondence.date,
+    notes: newCorrespondence.notes
+  }
+  const { error } = await supabase.from('correspondence').insert(entry)
+  if (!error) {
+    setCorrespondence([...correspondence, {
+      id: entry.id,
+      jobId: entry.job_id,
+      company: entry.company,
+      contact: entry.contact,
+      type: entry.type,
+      date: entry.date,
+      notes: entry.notes
+    }])
+  }
   setNewCorrespondence({ jobId: null, company: '', contact: '', type: '', date: '', notes: '' })
   setShowCorrespondenceForm(false)
 }

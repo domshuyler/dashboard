@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Tasks.css'
+import { supabase } from '../supabase'
 
 function Tasks({ tasks, setTasks }) {
   const [newTask, setNewTask] = useState({
@@ -9,30 +10,47 @@ function Tasks({ tasks, setTasks }) {
     category: ''
   })
 
-  const addTask = () => {
-    if (!newTask.title.trim()) return
+  const addTask = async () => {
+  if (!newTask.title.trim()) return
+  const task = {
+    id: Date.now(),
+    title: newTask.title,
+    completed: false,
+    priority: newTask.priority,
+    due_date: newTask.dueDate,
+    category: newTask.category
+  }
+  const { error } = await supabase.from('tasks').insert(task)
+  if (!error) {
     setTasks([...tasks, {
-      ...newTask,
-      id: Date.now(),
-      completed: false
+      id: task.id,
+      title: task.title,
+      completed: task.completed,
+      priority: task.priority,
+      dueDate: task.due_date,
+      category: task.category
     }])
-    setNewTask({
-      title: '',
-      priority: '',
-      dueDate: '',
-      category: ''
-    })
   }
+  setNewTask({ title: '', priority: '', dueDate: '', category: '' })
+}
 
-  const toggleTask = (id) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? { ...task, completed: !task.completed } : task
-    ))
+const toggleTask = async (id) => {
+  const task = tasks.find(t => t.id === id)
+  const { error } = await supabase
+    .from('tasks')
+    .update({ completed: !task.completed })
+    .eq('id', id)
+  if (!error) {
+    setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t))
   }
+}
 
-  const deleteTask = (id) => {
-    setTasks(tasks.filter(task => task.id !== id))
+const deleteTask = async (id) => {
+  const { error } = await supabase.from('tasks').delete().eq('id', id)
+  if (!error) {
+    setTasks(tasks.filter(t => t.id !== id))
   }
+}
 
   return (
     <div className="page">

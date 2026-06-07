@@ -2,6 +2,7 @@ import { useState } from 'react'
 import MDEditor from '@uiw/react-md-editor'
 import ReactMarkdown from 'react-markdown'
 import './Notes.css'
+import { supabase } from '../supabase'
 
 function Notes({ notes, setNotes }) {
   const [view, setView] = useState('list')
@@ -31,30 +32,58 @@ function Notes({ notes, setNotes }) {
     return matchesSearch && matchesTag && matchesCategory
   })
 
-  const saveNote = () => {
-    if (!newNote.title.trim()) return
-    const tags = newNote.tags
-      ? newNote.tags.split(',').map(t => t.trim()).filter(Boolean)
-      : []
-    setNotes([...notes, {
-      ...newNote,
-      tags,
-      id: Date.now(),
-      createdAt: new Date().toISOString()
-    }])
-    setNewNote({ title: '', content: '', category: '', tags: '' })
-    setView('list')
+  const saveNote = async () => {
+  if (!newNote.title.trim()) return
+  const tags = newNote.tags
+    ? newNote.tags.split(',').map(t => t.trim()).filter(Boolean)
+    : []
+  const note = {
+    id: Date.now(),
+    title: newNote.title,
+    content: newNote.content,
+    category: newNote.category,
+    tags,
+    created_at: new Date().toISOString()
   }
-  // eslint-disable-next-line no-unused-vars
-  const updateNote = (id, updates) => {
+  const { error } = await supabase.from('notes').insert(note)
+  if (!error) {
+    setNotes([...notes, {
+      id: note.id,
+      title: note.title,
+      content: note.content,
+      category: note.category,
+      tags: note.tags,
+      createdAt: note.created_at
+    }])
+  }
+  setNewNote({ title: '', content: '', category: '', tags: '' })
+  setView('list')
+}
+
+const updateNote = async (id, updates) => {
+  const { error } = await supabase
+    .from('notes')
+    .update({
+      title: updates.title,
+      content: updates.content,
+      category: updates.category,
+      tags: updates.tags
+    })
+    .eq('id', id)
+
+  if (!error) {
     setNotes(notes.map(n => n.id === id ? { ...n, ...updates } : n))
   }
+}
 
-  const deleteNote = (id) => {
+const deleteNote = async (id) => {
+  const { error } = await supabase.from('notes').delete().eq('id', id)
+  if (!error) {
     setNotes(notes.filter(n => n.id !== id))
     setActiveNote(null)
     setView('list')
   }
+}
 
   const askAI = async (prompt) => {
     setAiLoading(true)

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Habits.css'
+import { supabase } from '../supabase'
 
 function Habits({ habits, setHabits }) {
   const [newHabit, setNewHabit] = useState({
@@ -9,48 +10,74 @@ function Habits({ habits, setHabits }) {
 
   const today = new Date().toISOString().split('T')[0]
 
-  const addHabit = () => {
-    if (!newHabit.name.trim()) return
+ const addHabit = async () => {
+  if (!newHabit.name.trim()) return
+  const habit = {
+    id: Date.now(),
+    name: newHabit.name,
+    category: newHabit.category,
+    streak: 0,
+    last_completed: null,
+    completed_today: false
+  }
+  const { error } = await supabase.from('habits').insert(habit)
+  if (!error) {
     setHabits([...habits, {
-      ...newHabit,
-      id: Date.now(),
-      streak: 0,
-      lastCompleted: null,
-      completedToday: false
+      id: habit.id,
+      name: habit.name,
+      category: habit.category,
+      streak: habit.streak,
+      lastCompleted: habit.last_completed,
+      completedToday: habit.completed_today
     }])
-    setNewHabit({ name: '', category: '' })
+  }
+  setNewHabit({ name: '', category: '' })
+}
+
+const toggleHabit = async (id) => {
+  const habit = habits.find(h => h.id === id)
+  let updatedHabit
+
+  if (habit.completedToday) {
+    updatedHabit = {
+      ...habit,
+      completedToday: false,
+      streak: habit.streak > 0 ? habit.streak - 1 : 0,
+      lastCompleted: null
+    }
+  } else {
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+    const yesterdayStr = yesterday.toISOString().split('T')[0]
+    const newStreak = habit.lastCompleted === yesterdayStr ? habit.streak + 1 : 1
+    updatedHabit = {
+      ...habit,
+      completedToday: true,
+      streak: newStreak,
+      lastCompleted: today
+    }
   }
 
-  const toggleHabit = (id) => {
-    setHabits(habits.map(habit => {
-      if (habit.id !== id) return habit
+  const { error } = await supabase
+    .from('habits')
+    .update({
+      completed_today: updatedHabit.completedToday,
+      streak: updatedHabit.streak,
+      last_completed: updatedHabit.lastCompleted
+    })
+    .eq('id', id)
 
-      if (habit.completedToday) {
-        return {
-          ...habit,
-          completedToday: false,
-          streak: habit.streak > 0 ? habit.streak - 1 : 0,
-          lastCompleted: null
-        }
-      }
-
-      const yesterday = new Date()
-      yesterday.setDate(yesterday.getDate() - 1)
-      const yesterdayStr = yesterday.toISOString().split('T')[0]
-      const newStreak = habit.lastCompleted === yesterdayStr ? habit.streak + 1 : 1
-
-      return {
-        ...habit,
-        completedToday: true,
-        streak: newStreak,
-        lastCompleted: today
-      }
-    }))
+  if (!error) {
+    setHabits(habits.map(h => h.id === id ? updatedHabit : h))
   }
+}
 
-  const deleteHabit = (id) => {
-    setHabits(habits.filter(habit => habit.id !== id))
+const deleteHabit = async (id) => {
+  const { error } = await supabase.from('habits').delete().eq('id', id)
+  if (!error) {
+    setHabits(habits.filter(h => h.id !== id))
   }
+}
 
   const grouped = habits.reduce((acc, habit) => {
     const key = habit.category || 'Uncategorized'
