@@ -31,6 +31,16 @@ function App() {
   return saved ? JSON.parse(saved) : []
 })
 
+const [interviews, setInterviews] = useState(() => {
+  const saved = localStorage.getItem('interviews')
+  return saved ? JSON.parse(saved) : []
+})
+
+const [correspondence, setCorrespondence] = useState(() => {
+  const saved = localStorage.getItem('correspondence')
+  return saved ? JSON.parse(saved) : []
+})
+
 const [companies, setCompanies] = useState(() => {
   const saved = localStorage.getItem('companies')
   return saved ? JSON.parse(saved) : []
@@ -79,6 +89,15 @@ useEffect(() => {
   localStorage.setItem('companies', JSON.stringify(companies))
 }, [companies])
 
+useEffect(() => {
+  localStorage.setItem('interviews', JSON.stringify(interviews))
+}, [interviews])
+
+useEffect(() => {
+  localStorage.setItem('correspondence', JSON.stringify(correspondence))
+}, [correspondence])
+
+
   return (
     <BrowserRouter>
       <div className="app">
@@ -121,7 +140,16 @@ useEffect(() => {
 
             <Route path="/notes" element={<Notes notes={notes} setNotes={setNotes} />} />
             <Route path="/jobs" element={
-  <JobHunt jobs={jobs} setJobs={setJobs} companies={companies} setCompanies={setCompanies} />}
+             <JobHunt
+               jobs={jobs}
+               setJobs={setJobs}
+               companies={companies}
+               setCompanies={setCompanies}
+               interviews={interviews}
+               setInterviews={setInterviews}
+               correspondence={correspondence}
+               setCorrespondence={setCorrespondence}
+  />}
 />
             
           </Routes>

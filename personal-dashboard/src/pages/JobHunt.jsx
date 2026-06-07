@@ -25,11 +25,30 @@ const EMPTY_JOB = {
   source: ''
 }
 
-function JobHunt({ jobs, setJobs, companies, setCompanies }) {
+function JobHunt({ jobs, setJobs, companies, setCompanies, interviews, setInterviews, correspondence, setCorrespondence }) {
   const [view, setView] = useState('kanban')
   const [showForm, setShowForm] = useState(false)
   const [activeJob, setActiveJob] = useState(null)
   const [newJob, setNewJob] = useState(EMPTY_JOB)
+  const [showInterviewForm, setShowInterviewForm] = useState(false)
+  const [showCorrespondenceForm, setShowCorrespondenceForm] = useState(false)
+  const [newInterview, setNewInterview] = useState({
+  jobId: null,
+  company: '',
+  role: '',
+  date: '',
+  type: '',
+  prepNotes: '',
+  outcome: ''
+})
+  const [newCorrespondence, setNewCorrespondence] = useState({
+  jobId: null,
+  company: '',
+  contact: '',
+  type: '',
+  date: '',
+  notes: ''
+})
 
   const addJob = () => {
     if (!newJob.role.trim() || !newJob.company.trim()) return
@@ -47,6 +66,20 @@ function JobHunt({ jobs, setJobs, companies, setCompanies }) {
     setActiveJob(null)
     setView('kanban')
   }
+
+  const addInterview = () => {
+  if (!newInterview.company.trim()) return
+  setInterviews([...interviews, { ...newInterview, id: Date.now() }])
+  setNewInterview({ jobId: null, company: '', role: '', date: '', type: '', prepNotes: '', outcome: '' })
+  setShowInterviewForm(false)
+}
+
+const addCorrespondence = () => {
+  if (!newCorrespondence.company.trim()) return
+  setCorrespondence([...correspondence, { ...newCorrespondence, id: Date.now() }])
+  setNewCorrespondence({ jobId: null, company: '', contact: '', type: '', date: '', notes: '' })
+  setShowCorrespondenceForm(false)
+}
 
   return (
     <div className="page">
@@ -205,12 +238,134 @@ function JobHunt({ jobs, setJobs, companies, setCompanies }) {
       )}
 
       {view === 'interviews' && (
-        <div className="notes-empty">Interview tracking coming soon.</div>
-      )}
+  <div className="jh-interviews">
+    <div className="jh-section-header">
+      <button className="notes-btn-accent" onClick={() => setShowInterviewForm(!showInterviewForm)}>
+        {showInterviewForm ? 'Cancel' : '+ Add Interview'}
+      </button>
+    </div>
+
+    {showInterviewForm && (
+      <div className="jh-form">
+        <div className="jh-form-grid">
+          <select value={newInterview.jobId || ''} onChange={e => {
+            const job = jobs.find(j => j.id === Number(e.target.value))
+            setNewInterview({ ...newInterview, jobId: Number(e.target.value), company: job?.company || '', role: job?.role || '' })
+          }}>
+            <option value="">Link to application...</option>
+            {jobs.map(j => <option key={j.id} value={j.id}>{j.role} @ {j.company}</option>)}
+          </select>
+          <input placeholder="Company" value={newInterview.company} onChange={e => setNewInterview({ ...newInterview, company: e.target.value })} />
+          <input placeholder="Role" value={newInterview.role} onChange={e => setNewInterview({ ...newInterview, role: e.target.value })} />
+          <input type="date" value={newInterview.date} onChange={e => setNewInterview({ ...newInterview, date: e.target.value })} />
+          <select value={newInterview.type} onChange={e => setNewInterview({ ...newInterview, type: e.target.value })}>
+            <option value="">Interview Type</option>
+            <option>Phone Screen</option>
+            <option>Video</option>
+            <option>Onsite</option>
+            <option>Technical</option>
+            <option>Panel</option>
+          </select>
+          <select value={newInterview.outcome} onChange={e => setNewInterview({ ...newInterview, outcome: e.target.value })}>
+            <option value="">Outcome</option>
+            <option>Pending</option>
+            <option>Passed</option>
+            <option>Rejected</option>
+          </select>
+        </div>
+        <textarea placeholder="Prep notes..." value={newInterview.prepNotes} onChange={e => setNewInterview({ ...newInterview, prepNotes: e.target.value })} rows={4} />
+        <button className="notes-btn-accent" onClick={addInterview}>Save Interview</button>
+      </div>
+    )}
+
+    <div className="jh-list">
+      {interviews.length === 0 && <div className="notes-empty">No interviews logged yet.</div>}
+      {interviews.map(interview => (
+        <div key={interview.id} className="jh-interview-card">
+          <div className="jh-interview-header">
+            <div>
+              <div className="jh-card-role">{interview.role}</div>
+              <div className="jh-card-company">{interview.company}</div>
+            </div>
+            <div className="jh-interview-meta">
+              {interview.type && <span className="jh-status jh-status-applied">{interview.type}</span>}
+              {interview.outcome && (
+                <span className={`jh-status ${interview.outcome === 'Passed' ? 'jh-status-offer' : interview.outcome === 'Rejected' ? 'jh-status-rejected' : 'jh-status-saved'}`}>
+                  {interview.outcome}
+                </span>
+              )}
+              {interview.date && <span className="jh-card-meta">{interview.date}</span>}
+            </div>
+          </div>
+          {interview.prepNotes && (
+            <div className="jh-detail-text" style={{ marginTop: '0.75rem', fontSize: '0.85rem' }}>
+              {interview.prepNotes}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
       {view === 'correspondence' && (
-        <div className="notes-empty">Correspondence tracking coming soon.</div>
-      )}
+  <div className="jh-correspondence">
+    <div className="jh-section-header">
+      <button className="notes-btn-accent" onClick={() => setShowCorrespondenceForm(!showCorrespondenceForm)}>
+        {showCorrespondenceForm ? 'Cancel' : '+ Add Correspondence'}
+      </button>
+    </div>
+
+    {showCorrespondenceForm && (
+      <div className="jh-form">
+        <div className="jh-form-grid">
+          <select value={newCorrespondence.jobId || ''} onChange={e => {
+            const job = jobs.find(j => j.id === Number(e.target.value))
+            setNewCorrespondence({ ...newCorrespondence, jobId: Number(e.target.value), company: job?.company || '' })
+          }}>
+            <option value="">Link to application...</option>
+            {jobs.map(j => <option key={j.id} value={j.id}>{j.role} @ {j.company}</option>)}
+          </select>
+          <input placeholder="Company" value={newCorrespondence.company} onChange={e => setNewCorrespondence({ ...newCorrespondence, company: e.target.value })} />
+          <input placeholder="Contact person" value={newCorrespondence.contact} onChange={e => setNewCorrespondence({ ...newCorrespondence, contact: e.target.value })} />
+          <select value={newCorrespondence.type} onChange={e => setNewCorrespondence({ ...newCorrespondence, type: e.target.value })}>
+            <option value="">Type</option>
+            <option>Email</option>
+            <option>LinkedIn</option>
+            <option>Phone</option>
+            <option>In Person</option>
+          </select>
+          <input type="date" value={newCorrespondence.date} onChange={e => setNewCorrespondence({ ...newCorrespondence, date: e.target.value })} />
+        </div>
+        <textarea placeholder="Notes..." value={newCorrespondence.notes} onChange={e => setNewCorrespondence({ ...newCorrespondence, notes: e.target.value })} rows={3} />
+        <button className="notes-btn-accent" onClick={addCorrespondence}>Save</button>
+      </div>
+    )}
+
+    <div className="jh-list">
+      {correspondence.length === 0 && <div className="notes-empty">No correspondence logged yet.</div>}
+      {correspondence.map(c => (
+        <div key={c.id} className="jh-interview-card">
+          <div className="jh-interview-header">
+            <div>
+              <div className="jh-card-role">{c.contact || 'Unknown contact'}</div>
+              <div className="jh-card-company">{c.company}</div>
+            </div>
+            <div className="jh-interview-meta">
+              {c.type && <span className="jh-status jh-status-applied">{c.type}</span>}
+              {c.date && <span className="jh-card-meta">{c.date}</span>}
+            </div>
+          </div>
+          {c.notes && (
+            <div className="jh-detail-text" style={{ marginTop: '0.75rem', fontSize: '0.85rem' }}>
+              {c.notes}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
       {view === 'resources' && (
         <div className="jh-resources">
