@@ -10,6 +10,7 @@ import Calendar from './pages/Calendar'
 import Chat from './pages/Chat'
 import Notes from './pages/Notes'
 import JobHunt from './pages/JobHunt'
+import Finance from './pages/Finance'
 
 function App() {
   const [tasks, setTasks] = useState([])
@@ -21,25 +22,37 @@ function App() {
   const [correspondence, setCorrespondence] = useState([])
   const [calendarEvents, setCalendarEvents] = useState([])
   const [loading, setLoading] = useState(true)
+  const [transactions, setTransactions] = useState([])
+  const [budgets, setBudgets] = useState([])
+  const [accounts, setAccounts] = useState([])
+  const [savingsGoals, setSavingsGoals] = useState([])
 
   useEffect(() => {
     const fetchAll = async () => {
       const [
-        { data: tasksData },
-        { data: habitsData },
-        { data: goalsData },
-        { data: notesData },
-        { data: jobsData },
-        { data: interviewsData },
-        { data: correspondenceData }
-      ] = await Promise.all([
+  { data: tasksData },
+  { data: habitsData },
+  { data: goalsData },
+  { data: notesData },
+  { data: jobsData },
+  { data: interviewsData },
+  { data: correspondenceData },
+  { data: transactionsData },
+  { data: budgetsData },
+  { data: accountsData },
+  { data: savingsGoalsData }
+] = await Promise.all([
         supabase.from('tasks').select('*'),
         supabase.from('habits').select('*'),
         supabase.from('goals').select('*'),
         supabase.from('notes').select('*'),
         supabase.from('jobs').select('*'),
         supabase.from('interviews').select('*'),
-        supabase.from('correspondence').select('*')
+        supabase.from('correspondence').select('*'),
+        supabase.from('transactions').select('*'),
+        supabase.from('budgets').select('*'),
+        supabase.from('accounts').select('*'),
+        supabase.from('savings_goals').select('*'),
       ])
 
       if (tasksData) setTasks(tasksData.map(t => ({
@@ -124,6 +137,38 @@ function App() {
         notes: c.notes
       })))
 
+      if (transactionsData) setTransactions(transactionsData.map(t => ({
+  id: t.id,
+  type: t.type,
+  amount: t.amount,
+  category: t.category,
+  description: t.description,
+  date: t.date,
+  account: t.account
+})))
+
+if (budgetsData) setBudgets(budgetsData.map(b => ({
+  id: b.id,
+  category: b.category,
+  limit: b.limit_amount,
+  month: b.month
+})))
+
+if (accountsData) setAccounts(accountsData.map(a => ({
+  id: a.id,
+  name: a.name,
+  type: a.type,
+  balance: a.balance
+})))
+
+if (savingsGoalsData) setSavingsGoals(savingsGoalsData.map(s => ({
+  id: s.id,
+  title: s.title,
+  target: s.target,
+  current: s.current,
+  deadline: s.deadline
+})))
+
       setLoading(false)
     }
 
@@ -152,6 +197,7 @@ function App() {
             <NavLink to="/chat">Chat</NavLink>
             <NavLink to="/notes">Notes</NavLink>
             <NavLink to="/jobs">Job Hunt</NavLink>
+            <NavLink to="/finance">Finance</NavLink>
           </nav>
         </aside>
         <main className="main-content">
@@ -194,6 +240,18 @@ function App() {
                 setCorrespondence={setCorrespondence}
               />}
             />
+            <Route path="/finance" element={
+  <Finance
+    transactions={transactions}
+    setTransactions={setTransactions}
+    budgets={budgets}
+    setBudgets={setBudgets}
+    accounts={accounts}
+    setAccounts={setAccounts}
+    savingsGoals={savingsGoals}
+    setSavingsGoals={setSavingsGoals}
+  />}
+/>
           </Routes>
         </main>
       </div>

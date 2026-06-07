@@ -1,0 +1,186 @@
+.finance-month-picker {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.finance-month-picker:focus {
+  border-color: var(--color-accent);
+}
+
+.finance-section-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.75rem;
+  margin-top: 1rem;
+}
+
+.finance-budget-row {
+  margin-bottom: 0.75rem;
+}
+
+.finance-budget-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+}
+
+.finance-budget-category {
+  font-size: 0.88rem;
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.finance-budget-amounts {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.finance-budget-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.finance-budget-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  transition: border-color 0.15s;
+}
+
+.finance-budget-card:hover {
+  border-color: var(--color-accent);
+}
+
+.finance-transaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.finance-transaction-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  transition: border-color 0.15s;
+}
+
+.finance-transaction-row:hover {
+  border-color: var(--color-accent);
+}
+
+.finance-transaction-type {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.finance-transaction-type.expense {
+  background-color: #f87171;
+}
+
+.finance-transaction-type.income {
+  background-color: #4ade80;
+}
+
+.finance-transaction-info {
+  flex: 1;
+}
+
+.finance-transaction-desc {
+  font-size: 0.88rem;
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.finance-transaction-meta {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.finance-transaction-amount {
+  font-size: 0.95rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.finance-transaction-amount.expense {
+  color: #f87171;
+}
+
+.finance-transaction-amount.income {
+  color: #4ade80;
+}
+
+.finance-account-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.finance-account-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: border-color 0.15s;
+}
+
+.finance-account-card:hover {
+  border-color: var(--color-accent);
+}
+
+.finance-account-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.finance-account-type {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  text-transform: capitalize;
+  margin-top: 2px;
+}
+
+.finance-account-balance-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.finance-balance-input {
+  background-color: var(--color-base);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text);
+  padding: 0.4rem 0.75rem;
+  font-size: 0.9rem;
+  outline: none;
+  width: 140px;
+  text-align: right;
+}
+
+.finance-balance-input:focus {
+  border-color: var(--color-accent);
+}
