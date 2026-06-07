@@ -3,6 +3,7 @@ import './Tasks.css'
 import { supabase } from '../supabase'
 
 function Tasks({ tasks, setTasks }) {
+  document.title = 'Tasks — Dashboard'
   const [newTask, setNewTask] = useState({
     title: '',
     priority: '',

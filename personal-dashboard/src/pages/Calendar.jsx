@@ -18,6 +18,7 @@ const localizer = dateFnsLocalizer({
 })
 
 function Calendar({ calendarEvents, setCalendarEvents }) {
+  document.title = 'Calendar — Dashboard'
   const [token, setToken] = useState(() => localStorage.getItem('google_token'))
   const [loading, setLoading] = useState(false)
 

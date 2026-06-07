@@ -3,6 +3,7 @@ import './Goals.css'
 import { supabase } from '../supabase'
 
 function Goals() {
+ document.title = 'Goals — Dashboard'
  const [goals, setGoals] = useState(() => {
   const saved = localStorage.getItem('goals')
   return saved ? JSON.parse(saved) : []

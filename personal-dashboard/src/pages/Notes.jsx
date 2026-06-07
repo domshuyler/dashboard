@@ -5,6 +5,7 @@ import './Notes.css'
 import { supabase } from '../supabase'
 
 function Notes({ notes, setNotes }) {
+  document.title = 'Notes — Dashboard'
   const [view, setView] = useState('list')
   const [activeNote, setActiveNote] = useState(null)
   const [search, setSearch] = useState('')

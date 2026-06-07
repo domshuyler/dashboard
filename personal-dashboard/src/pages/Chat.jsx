@@ -3,6 +3,7 @@ import { useState } from 'react'
 import './Chat.css'
 
 function Chat() {
+  document.title = 'Chat — Dashboard'
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import './Home.css'
 
 function Home({ tasks, habits, goals, calendarEvents, jobs, interviews }) {
+  document.title = 'Dashboard'
   const navigate = useNavigate()
   const today = new Date().toISOString().split('T')[0]
 

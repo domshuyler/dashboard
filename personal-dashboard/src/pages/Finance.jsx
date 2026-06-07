@@ -6,6 +6,7 @@ const EXPENSE_CATEGORIES = ['Housing', 'Food', 'Transport', 'Health', 'Entertain
 const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Investment', 'Gift', 'Other']
 
 function Finance({ transactions, setTransactions, budgets, setBudgets, accounts, setAccounts, savingsGoals, setSavingsGoals }) {
+  document.title = 'Finance — Dashboard'
   const [view, setView] = useState('dashboard')
   const [showTransactionForm, setShowTransactionForm] = useState(false)
   const [showBudgetForm, setShowBudgetForm] = useState(false)

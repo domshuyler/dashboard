@@ -28,6 +28,7 @@ const EMPTY_JOB = {
 }
 
 function JobHunt({ jobs, setJobs, companies, setCompanies, interviews, setInterviews, correspondence, setCorrespondence }) {
+  document.title = 'Job Hunt — Dashboard'
   const [view, setView] = useState('kanban')
   const [showForm, setShowForm] = useState(false)
   const [activeJob, setActiveJob] = useState(null)

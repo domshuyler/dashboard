@@ -3,6 +3,7 @@ import './Habits.css'
 import { supabase } from '../supabase'
 
 function Habits({ habits, setHabits }) {
+  document.title = 'Habits — Dashboard'
   const [newHabit, setNewHabit] = useState({
     name: '',
     category: ''

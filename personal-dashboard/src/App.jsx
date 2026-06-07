@@ -12,6 +12,8 @@ import Notes from './pages/Notes'
 import JobHunt from './pages/JobHunt'
 import Finance from './pages/Finance'
 
+const [sidebarOpen, setSidebarOpen] = useState(false)
+
 function App() {
   const [tasks, setTasks] = useState([])
   const [habits, setHabits] = useState([])
@@ -176,32 +178,49 @@ if (savingsGoalsData) setSavingsGoals(savingsGoalsData.map(s => ({
   }, [])
 
   if (loading) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'var(--color-text-muted)' }}>
-        Loading...
+  return (
+    <div className="app-loading">
+      <div className="app-loading-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="48" height="48">
+          <rect width="32" height="32" rx="6" fill="#0f0f0f"/>
+          <rect x="5" y="5" width="9" height="9" rx="2" fill="#09bfbd"/>
+          <rect x="18" y="5" width="9" height="9" rx="2" fill="#09bfbd" opacity="0.6"/>
+          <rect x="5" y="18" width="9" height="9" rx="2" fill="#09bfbd" opacity="0.6"/>
+          <rect x="18" y="18" width="9" height="9" rx="2" fill="#09bfbd" opacity="0.3"/>
+        </svg>
       </div>
-    )
-  }
+      <div className="app-loading-text">Loading your dashboard...</div>
+    </div>
+  )
+}
 
   return (
     <BrowserRouter>
       <div className="app">
-        <aside className="sidebar">
-          <NavLink to="/" className="sidebar-logo">Dashboard</NavLink>
-          <nav className="sidebar-nav">
-            <NavLink to="/" end>Home</NavLink>
-            <NavLink to="/tasks">Tasks</NavLink>
-            <NavLink to="/habits">Habits</NavLink>
-            <NavLink to="/goals">Goals</NavLink>
-            <NavLink to="/calendar">Calendar</NavLink>
-            <NavLink to="/chat">Chat</NavLink>
-            <NavLink to="/notes">Notes</NavLink>
-            <NavLink to="/jobs">Job Hunt</NavLink>
-            <NavLink to="/finance">Finance</NavLink>
-          </nav>
-        </aside>
-        <main className="main-content">
-          <Routes>
+  <div className={`sidebar-overlay ${sidebarOpen ? 'open' : ''}`} onClick={() => setSidebarOpen(false)} />
+  <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+    <div className="sidebar-header">
+      <NavLink to="/" className="sidebar-logo" onClick={() => setSidebarOpen(false)}>Dashboard</NavLink>
+      <button className="sidebar-close" onClick={() => setSidebarOpen(false)}>×</button>
+    </div>
+    <nav className="sidebar-nav">
+      <NavLink to="/" end onClick={() => setSidebarOpen(false)}>Home</NavLink>
+      <NavLink to="/tasks" onClick={() => setSidebarOpen(false)}>Tasks</NavLink>
+      <NavLink to="/habits" onClick={() => setSidebarOpen(false)}>Habits</NavLink>
+      <NavLink to="/goals" onClick={() => setSidebarOpen(false)}>Goals</NavLink>
+      <NavLink to="/calendar" onClick={() => setSidebarOpen(false)}>Calendar</NavLink>
+      <NavLink to="/chat" onClick={() => setSidebarOpen(false)}>Chat</NavLink>
+      <NavLink to="/notes" onClick={() => setSidebarOpen(false)}>Notes</NavLink>
+      <NavLink to="/jobs" onClick={() => setSidebarOpen(false)}>Job Hunt</NavLink>
+      <NavLink to="/finance" onClick={() => setSidebarOpen(false)}>Finance</NavLink>
+    </nav>
+  </aside>
+  <div className="main-wrapper">
+    <div className="topbar">
+      <button className="hamburger" onClick={() => setSidebarOpen(true)}>☰</button>
+    </div>
+    <main className="main-content">
+      <Routes>
             <Route path="/" element={
               <Home
                 tasks={tasks}
@@ -254,6 +273,7 @@ if (savingsGoalsData) setSavingsGoals(savingsGoalsData.map(s => ({
 />
           </Routes>
         </main>
+      </div>
       </div>
     </BrowserRouter>
   )
