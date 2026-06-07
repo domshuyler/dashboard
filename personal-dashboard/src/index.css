@@ -20,3 +20,7 @@ body {
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
 }
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="month"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
