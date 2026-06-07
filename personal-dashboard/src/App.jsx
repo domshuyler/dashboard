@@ -164,12 +164,12 @@ function App() {
             <NavLink to="/tasks" onClick={() => setSidebarOpen(false)}>Tasks</NavLink>
             <NavLink to="/habits" onClick={() => setSidebarOpen(false)}>Habits</NavLink>
             <NavLink to="/goals" onClick={() => setSidebarOpen(false)}>Goals</NavLink>
+            <NavLink to="/projects" onClick={() => setSidebarOpen(false)}>Projects</NavLink>
             <NavLink to="/calendar" onClick={() => setSidebarOpen(false)}>Calendar</NavLink>
-            <NavLink to="/chat" onClick={() => setSidebarOpen(false)}>Chat</NavLink>
             <NavLink to="/notes" onClick={() => setSidebarOpen(false)}>Notes</NavLink>
+            <NavLink to="/chat" onClick={() => setSidebarOpen(false)}>Chat</NavLink>
             <NavLink to="/jobs" onClick={() => setSidebarOpen(false)}>Job Hunt</NavLink>
             <NavLink to="/finance" onClick={() => setSidebarOpen(false)}>Finance</NavLink>
-            <NavLink to="/projects" onClick={() => setSidebarOpen(false)}>Projects</NavLink>
           </nav>
         </aside>
         <div className="main-wrapper">
