@@ -12,8 +12,6 @@ import Notes from './pages/Notes'
 import JobHunt from './pages/JobHunt'
 import Finance from './pages/Finance'
 
-const [sidebarOpen, setSidebarOpen] = useState(false)
-
 function App() {
   const [tasks, setTasks] = useState([])
   const [habits, setHabits] = useState([])
@@ -23,27 +21,28 @@ function App() {
   const [interviews, setInterviews] = useState([])
   const [correspondence, setCorrespondence] = useState([])
   const [calendarEvents, setCalendarEvents] = useState([])
-  const [loading, setLoading] = useState(true)
   const [transactions, setTransactions] = useState([])
   const [budgets, setBudgets] = useState([])
   const [accounts, setAccounts] = useState([])
   const [savingsGoals, setSavingsGoals] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     const fetchAll = async () => {
       const [
-  { data: tasksData },
-  { data: habitsData },
-  { data: goalsData },
-  { data: notesData },
-  { data: jobsData },
-  { data: interviewsData },
-  { data: correspondenceData },
-  { data: transactionsData },
-  { data: budgetsData },
-  { data: accountsData },
-  { data: savingsGoalsData }
-] = await Promise.all([
+        { data: tasksData },
+        { data: habitsData },
+        { data: goalsData },
+        { data: notesData },
+        { data: jobsData },
+        { data: interviewsData },
+        { data: correspondenceData },
+        { data: transactionsData },
+        { data: budgetsData },
+        { data: accountsData },
+        { data: savingsGoalsData }
+      ] = await Promise.all([
         supabase.from('tasks').select('*'),
         supabase.from('habits').select('*'),
         supabase.from('goals').select('*'),
@@ -54,122 +53,67 @@ function App() {
         supabase.from('transactions').select('*'),
         supabase.from('budgets').select('*'),
         supabase.from('accounts').select('*'),
-        supabase.from('savings_goals').select('*'),
+        supabase.from('savings_goals').select('*')
       ])
 
       if (tasksData) setTasks(tasksData.map(t => ({
-        id: t.id,
-        title: t.title,
-        completed: t.completed,
-        priority: t.priority,
-        dueDate: t.due_date,
-        category: t.category
+        id: t.id, title: t.title, completed: t.completed,
+        priority: t.priority, dueDate: t.due_date, category: t.category
       })))
 
       if (habitsData) setHabits(habitsData.map(h => ({
-        id: h.id,
-        name: h.name,
-        category: h.category,
-        streak: h.streak,
-        lastCompleted: h.last_completed,
-        completedToday: h.completed_today
+        id: h.id, name: h.name, category: h.category,
+        streak: h.streak, lastCompleted: h.last_completed, completedToday: h.completed_today
       })))
 
       if (goalsData) setGoals(goalsData.map(g => ({
-        id: g.id,
-        title: g.title,
-        category: g.category,
-        deadline: g.deadline,
-        target: g.target,
-        current: g.current,
-        unit: g.unit,
-        completed: g.completed
+        id: g.id, title: g.title, category: g.category,
+        deadline: g.deadline, target: g.target, current: g.current,
+        unit: g.unit, completed: g.completed
       })))
 
       if (notesData) setNotes(notesData.map(n => ({
-        id: n.id,
-        title: n.title,
-        content: n.content,
-        category: n.category,
-        tags: n.tags || [],
-        createdAt: n.created_at
+        id: n.id, title: n.title, content: n.content,
+        category: n.category, tags: n.tags || [], createdAt: n.created_at
       })))
 
       if (jobsData) setJobs(jobsData.map(j => ({
-        id: j.id,
-        role: j.role,
-        company: j.company,
-        postUrl: j.post_url,
-        directApplicationUrl: j.direct_application_url,
-        location: j.location,
-        workFormat: j.work_format,
-        employmentType: j.employment_type,
-        datePosted: j.date_posted,
-        applicationDeadline: j.application_deadline,
-        salary: j.salary,
-        status: j.status,
-        dateApplied: j.date_applied,
-        active: j.active,
-        nextFollowUp: j.next_follow_up,
-        contactPerson: j.contact_person,
-        contactDetails: j.contact_details,
-        jobDescription: j.job_description,
-        notes: j.notes,
-        source: j.source
+        id: j.id, role: j.role, company: j.company,
+        postUrl: j.post_url, directApplicationUrl: j.direct_application_url,
+        location: j.location, workFormat: j.work_format, employmentType: j.employment_type,
+        datePosted: j.date_posted, applicationDeadline: j.application_deadline,
+        salary: j.salary, status: j.status, dateApplied: j.date_applied,
+        active: j.active, nextFollowUp: j.next_follow_up, contactPerson: j.contact_person,
+        contactDetails: j.contact_details, jobDescription: j.job_description,
+        notes: j.notes, source: j.source
       })))
 
       if (interviewsData) setInterviews(interviewsData.map(i => ({
-        id: i.id,
-        jobId: i.job_id,
-        company: i.company,
-        role: i.role,
-        date: i.date,
-        type: i.type,
-        prepNotes: i.prep_notes,
-        outcome: i.outcome
+        id: i.id, jobId: i.job_id, company: i.company, role: i.role,
+        date: i.date, type: i.type, prepNotes: i.prep_notes, outcome: i.outcome
       })))
 
       if (correspondenceData) setCorrespondence(correspondenceData.map(c => ({
-        id: c.id,
-        jobId: c.job_id,
-        company: c.company,
-        contact: c.contact,
-        type: c.type,
-        date: c.date,
-        notes: c.notes
+        id: c.id, jobId: c.job_id, company: c.company, contact: c.contact,
+        type: c.type, date: c.date, notes: c.notes
       })))
 
       if (transactionsData) setTransactions(transactionsData.map(t => ({
-  id: t.id,
-  type: t.type,
-  amount: t.amount,
-  category: t.category,
-  description: t.description,
-  date: t.date,
-  account: t.account
-})))
+        id: t.id, type: t.type, amount: t.amount, category: t.category,
+        description: t.description, date: t.date, account: t.account
+      })))
 
-if (budgetsData) setBudgets(budgetsData.map(b => ({
-  id: b.id,
-  category: b.category,
-  limit: b.limit_amount,
-  month: b.month
-})))
+      if (budgetsData) setBudgets(budgetsData.map(b => ({
+        id: b.id, category: b.category, limit: b.limit_amount, month: b.month
+      })))
 
-if (accountsData) setAccounts(accountsData.map(a => ({
-  id: a.id,
-  name: a.name,
-  type: a.type,
-  balance: a.balance
-})))
+      if (accountsData) setAccounts(accountsData.map(a => ({
+        id: a.id, name: a.name, type: a.type, balance: a.balance
+      })))
 
-if (savingsGoalsData) setSavingsGoals(savingsGoalsData.map(s => ({
-  id: s.id,
-  title: s.title,
-  target: s.target,
-  current: s.current,
-  deadline: s.deadline
-})))
+      if (savingsGoalsData) setSavingsGoals(savingsGoalsData.map(s => ({
+        id: s.id, title: s.title, target: s.target, current: s.current, deadline: s.deadline
+      })))
 
       setLoading(false)
     }
@@ -178,102 +122,102 @@ if (savingsGoalsData) setSavingsGoals(savingsGoalsData.map(s => ({
   }, [])
 
   if (loading) {
-  return (
-    <div className="app-loading">
-      <div className="app-loading-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="48" height="48">
-          <rect width="32" height="32" rx="6" fill="#0f0f0f"/>
-          <rect x="5" y="5" width="9" height="9" rx="2" fill="#09bfbd"/>
-          <rect x="18" y="5" width="9" height="9" rx="2" fill="#09bfbd" opacity="0.6"/>
-          <rect x="5" y="18" width="9" height="9" rx="2" fill="#09bfbd" opacity="0.6"/>
-          <rect x="18" y="18" width="9" height="9" rx="2" fill="#09bfbd" opacity="0.3"/>
-        </svg>
+    return (
+      <div className="app-loading">
+        <div className="app-loading-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="48" height="48">
+            <rect width="32" height="32" rx="6" fill="#0f0f0f"/>
+            <rect x="5" y="5" width="9" height="9" rx="2" fill="#09bfbd"/>
+            <rect x="18" y="5" width="9" height="9" rx="2" fill="#09bfbd" opacity="0.6"/>
+            <rect x="5" y="18" width="9" height="9" rx="2" fill="#09bfbd" opacity="0.6"/>
+            <rect x="18" y="18" width="9" height="9" rx="2" fill="#09bfbd" opacity="0.3"/>
+          </svg>
+        </div>
+        <div className="app-loading-text">Loading your dashboard...</div>
       </div>
-      <div className="app-loading-text">Loading your dashboard...</div>
-    </div>
-  )
-}
+    )
+  }
 
   return (
     <BrowserRouter>
       <div className="app">
-  <div className={`sidebar-overlay ${sidebarOpen ? 'open' : ''}`} onClick={() => setSidebarOpen(false)} />
-  <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-    <div className="sidebar-header">
-      <NavLink to="/" className="sidebar-logo" onClick={() => setSidebarOpen(false)}>Dashboard</NavLink>
-      <button className="sidebar-close" onClick={() => setSidebarOpen(false)}>×</button>
-    </div>
-    <nav className="sidebar-nav">
-      <NavLink to="/" end onClick={() => setSidebarOpen(false)}>Home</NavLink>
-      <NavLink to="/tasks" onClick={() => setSidebarOpen(false)}>Tasks</NavLink>
-      <NavLink to="/habits" onClick={() => setSidebarOpen(false)}>Habits</NavLink>
-      <NavLink to="/goals" onClick={() => setSidebarOpen(false)}>Goals</NavLink>
-      <NavLink to="/calendar" onClick={() => setSidebarOpen(false)}>Calendar</NavLink>
-      <NavLink to="/chat" onClick={() => setSidebarOpen(false)}>Chat</NavLink>
-      <NavLink to="/notes" onClick={() => setSidebarOpen(false)}>Notes</NavLink>
-      <NavLink to="/jobs" onClick={() => setSidebarOpen(false)}>Job Hunt</NavLink>
-      <NavLink to="/finance" onClick={() => setSidebarOpen(false)}>Finance</NavLink>
-    </nav>
-  </aside>
-  <div className="main-wrapper">
-    <div className="topbar">
-      <button className="hamburger" onClick={() => setSidebarOpen(true)}>☰</button>
-    </div>
-    <main className="main-content">
-      <Routes>
-            <Route path="/" element={
-              <Home
-                tasks={tasks}
-                habits={habits}
-                goals={goals}
-                calendarEvents={calendarEvents}
-                jobs={jobs}
-                interviews={interviews}
-              />}
-            />
-            <Route path="/tasks" element={
-              <Tasks tasks={tasks} setTasks={setTasks} />}
-            />
-            <Route path="/habits" element={
-              <Habits habits={habits} setHabits={setHabits} />}
-            />
-            <Route path="/goals" element={
-              <Goals goals={goals} setGoals={setGoals} />}
-            />
-            <Route path="/calendar" element={
-              <Calendar calendarEvents={calendarEvents} setCalendarEvents={setCalendarEvents} />}
-            />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/notes" element={
-              <Notes notes={notes} setNotes={setNotes} />}
-            />
-            <Route path="/jobs" element={
-              <JobHunt
-                jobs={jobs}
-                setJobs={setJobs}
-                companies={[]}
-                setCompanies={() => {}}
-                interviews={interviews}
-                setInterviews={setInterviews}
-                correspondence={correspondence}
-                setCorrespondence={setCorrespondence}
-              />}
-            />
-            <Route path="/finance" element={
-  <Finance
-    transactions={transactions}
-    setTransactions={setTransactions}
-    budgets={budgets}
-    setBudgets={setBudgets}
-    accounts={accounts}
-    setAccounts={setAccounts}
-    savingsGoals={savingsGoals}
-    setSavingsGoals={setSavingsGoals}
-  />}
-/>
-          </Routes>
-        </main>
-      </div>
+        <div className={`sidebar-overlay ${sidebarOpen ? 'open' : ''}`} onClick={() => setSidebarOpen(false)} />
+        <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+          <div className="sidebar-header">
+            <NavLink to="/" className="sidebar-logo" onClick={() => setSidebarOpen(false)}>Dashboard</NavLink>
+            <button className="sidebar-close" onClick={() => setSidebarOpen(false)}>×</button>
+          </div>
+          <nav className="sidebar-nav">
+            <NavLink to="/" end onClick={() => setSidebarOpen(false)}>Home</NavLink>
+            <NavLink to="/tasks" onClick={() => setSidebarOpen(false)}>Tasks</NavLink>
+            <NavLink to="/habits" onClick={() => setSidebarOpen(false)}>Habits</NavLink>
+            <NavLink to="/goals" onClick={() => setSidebarOpen(false)}>Goals</NavLink>
+            <NavLink to="/calendar" onClick={() => setSidebarOpen(false)}>Calendar</NavLink>
+            <NavLink to="/chat" onClick={() => setSidebarOpen(false)}>Chat</NavLink>
+            <NavLink to="/notes" onClick={() => setSidebarOpen(false)}>Notes</NavLink>
+            <NavLink to="/jobs" onClick={() => setSidebarOpen(false)}>Job Hunt</NavLink>
+            <NavLink to="/finance" onClick={() => setSidebarOpen(false)}>Finance</NavLink>
+          </nav>
+        </aside>
+        <div className="main-wrapper">
+          <div className="topbar">
+            <button className="hamburger" onClick={() => setSidebarOpen(true)}>☰</button>
+          </div>
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={
+                <Home
+                  tasks={tasks}
+                  habits={habits}
+                  goals={goals}
+                  calendarEvents={calendarEvents}
+                  jobs={jobs}
+                  interviews={interviews}
+                />}
+              />
+              <Route path="/tasks" element={
+                <Tasks tasks={tasks} setTasks={setTasks} />}
+              />
+              <Route path="/habits" element={
+                <Habits habits={habits} setHabits={setHabits} />}
+              />
+              <Route path="/goals" element={
+                <Goals goals={goals} setGoals={setGoals} />}
+              />
+              <Route path="/calendar" element={
+                <Calendar calendarEvents={calendarEvents} setCalendarEvents={setCalendarEvents} />}
+              />
+              <Route path="/chat" element={<Chat />} />
+              <Route path="/notes" element={
+                <Notes notes={notes} setNotes={setNotes} />}
+              />
+              <Route path="/jobs" element={
+                <JobHunt
+                  jobs={jobs}
+                  setJobs={setJobs}
+                  companies={[]}
+                  setCompanies={() => {}}
+                  interviews={interviews}
+                  setInterviews={setInterviews}
+                  correspondence={correspondence}
+                  setCorrespondence={setCorrespondence}
+                />}
+              />
+              <Route path="/finance" element={
+                <Finance
+                  transactions={transactions}
+                  setTransactions={setTransactions}
+                  budgets={budgets}
+                  setBudgets={setBudgets}
+                  accounts={accounts}
+                  setAccounts={setAccounts}
+                  savingsGoals={savingsGoals}
+                  setSavingsGoals={setSavingsGoals}
+                />}
+              />
+            </Routes>
+          </main>
+        </div>
       </div>
     </BrowserRouter>
   )
