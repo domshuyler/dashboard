@@ -184,3 +184,10 @@
 .finance-balance-input:focus {
   border-color: var(--color-accent);
 }
+
+.finance-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
