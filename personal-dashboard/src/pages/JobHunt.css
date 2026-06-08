@@ -1,3 +1,56 @@
+.punch-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  max-width: 480px;
+}
+
+.punch-card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.punch-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.punch-card-goal {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.punch-stars-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+  margin-bottom: 0.75rem;
+}
+
+.punch-star {
+  width: 100%;
+  aspect-ratio: 1;
+  display: block;
+}
+
+.punch-progress {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.punch-prize {
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
 .jh-header {
   display: flex;
   align-items: center;

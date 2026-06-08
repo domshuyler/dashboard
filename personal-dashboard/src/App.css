@@ -50,14 +50,6 @@
   flex: 1;
 }
 
-.sidebar-logo {
-  color: var(--color-accent);
-  text-decoration: none;
-  font-size: 1.2rem;
-  font-weight: 600;
-  padding-left: 0.5rem;
-}
-
 .sidebar-logo:hover {
   color: var(--color-accent);
   background-color: transparent;
@@ -67,6 +59,24 @@
   color: var(--color-accent);
   background-color: var(--color-accent-muted);
 }
+.sidebar-signout {
+  margin-top: auto;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-muted);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+
+.sidebar-signout:hover {
+  border-color: #f87171;
+  color: #f87171;
+}
+
 .app-loading {
   display: flex;
   flex-direction: column;

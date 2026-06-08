@@ -2,6 +2,7 @@ import './App.css'
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
+import Login from './pages/Login'
 import Home from './pages/Home'
 import Tasks from './pages/Tasks'
 import Habits from './pages/Habits'
@@ -14,6 +15,7 @@ import Finance from './pages/Finance'
 import Projects from './pages/Projects'
 
 function App() {
+  const [session, setSession] = useState(undefined)
   const [tasks, setTasks] = useState([])
   const [habits, setHabits] = useState([])
   const [goals, setGoals] = useState([])
@@ -31,6 +33,15 @@ function App() {
   const [projects, setProjects] = useState([])
 
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    if (!session) return
     const fetchAll = async () => {
       const [
         { data: tasksData },
@@ -119,19 +130,39 @@ function App() {
         id: s.id, title: s.title, target: s.target, current: s.current, deadline: s.deadline
       })))
       if (projectsData) setProjects(projectsData.map(p => ({
-  id: p.id,
-  name: p.name,
-  description: p.description,
-  status: p.status,
-  deadline: p.deadline,
-  notes: p.notes
-})))
+        id: p.id,
+        name: p.name,
+        description: p.description,
+        status: p.status,
+        deadline: p.deadline,
+        notes: p.notes
+      })))
 
       setLoading(false)
     }
 
     fetchAll()
-  }, [])
+  }, [session])
+
+  if (session === undefined) {
+    return (
+      <div className="app-loading">
+        <div className="app-loading-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="48" height="48">
+            <rect width="32" height="32" rx="6" fill="#0f0f0f"/>
+            <rect x="5" y="5" width="9" height="9" rx="2" fill="#09bfbd"/>
+            <rect x="18" y="5" width="9" height="9" rx="2" fill="#09bfbd" opacity="0.6"/>
+            <rect x="5" y="18" width="9" height="9" rx="2" fill="#09bfbd" opacity="0.6"/>
+            <rect x="18" y="18" width="9" height="9" rx="2" fill="#09bfbd" opacity="0.3"/>
+          </svg>
+        </div>
+      </div>
+    )
+  }
+
+  if (!session) {
+    return <Login />
+  }
 
   if (loading) {
     return (
@@ -171,6 +202,12 @@ function App() {
             <NavLink to="/jobs" onClick={() => setSidebarOpen(false)}>Job Hunt</NavLink>
             <NavLink to="/finance" onClick={() => setSidebarOpen(false)}>Finance</NavLink>
           </nav>
+          <button
+            className="sidebar-signout"
+            onClick={() => supabase.auth.signOut()}
+          >
+            Sign out
+          </button>
         </aside>
         <div className="main-wrapper">
           <div className="topbar">

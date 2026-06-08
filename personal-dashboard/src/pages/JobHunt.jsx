@@ -1,7 +1,61 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
 import ReactMarkdown from 'react-markdown'
 import './JobHunt.css'
+
+const STAR_POINTS = (() => {
+  const pts = []
+  for (let i = 0; i < 5; i++) {
+    const outer = (Math.PI * 2 * i / 5) - Math.PI / 2
+    const inner = outer + Math.PI / 5
+    pts.push(`${(50 + 38 * Math.cos(outer)).toFixed(2)},${(50 + 38 * Math.sin(outer)).toFixed(2)}`)
+    pts.push(`${(50 + 16 * Math.cos(inner)).toFixed(2)},${(50 + 16 * Math.sin(inner)).toFixed(2)}`)
+  }
+  return pts.join(' ')
+})()
+
+function Star({ state }) {
+  if (state === 'filled') return (
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="punch-star">
+      <polygon points={STAR_POINTS} fill="#09bfbd" />
+    </svg>
+  )
+  if (state === 'last') return (
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="punch-star">
+      <polygon points={STAR_POINTS} fill="#09bfbd" stroke="#07a5a3" strokeWidth="2" />
+    </svg>
+  )
+  return (
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="punch-star">
+      <polygon points={STAR_POINTS} fill="transparent" stroke="var(--color-border)" strokeWidth="3" strokeDasharray="6,3" />
+    </svg>
+  )
+}
+
+function PunchCard({ filled }) {
+  const total = 10
+  const count = Math.min(filled, total)
+  return (
+    <div className="punch-card">
+      <div className="punch-card-header">
+        <div className="punch-card-title">Job Applications</div>
+        <div className="punch-card-goal">Apply to {total} jobs for a prize!</div>
+      </div>
+      <div className="punch-stars-grid">
+        {Array.from({ length: total }, (_, i) => {
+          const state = i < count ? (i === count - 1 ? 'last' : 'filled') : 'empty'
+          return <Star key={i} state={state} />
+        })}
+      </div>
+      <div className="punch-progress">
+        {count === total ? '🎉 All 10 applications submitted!' : `${count} of ${total} applications submitted`}
+      </div>
+      {count === total && (
+        <div className="punch-prize">🎉 Prize unlocked! Time to collect your reward.</div>
+      )}
+    </div>
+  )
+}
 
 const STAGES = ['saved', 'applied', 'interview', 'final round', 'offer', 'rejected', 'ghosted']
 
@@ -28,7 +82,7 @@ const EMPTY_JOB = {
 }
 
 function JobHunt({ jobs, setJobs, companies, setCompanies, interviews, setInterviews, correspondence, setCorrespondence }) {
-  document.title = 'Job Hunt — Dashboard'
+  useEffect(() => { document.title = 'Job Hunt — Dashboard' }, [])
   const [view, setView] = useState('kanban')
   const [showForm, setShowForm] = useState(false)
   const [activeJob, setActiveJob] = useState(null)
@@ -200,17 +254,12 @@ function JobHunt({ jobs, setJobs, companies, setCompanies, interviews, setInterv
     setPrepResult('')
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': import.meta.env.VITE_ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-5',
-          max_tokens: 1000,
+          max_tokens: 1024,
           system: 'You are an expert career coach helping someone prepare for a job interview. Be specific, practical, and encouraging.',
           messages: [{
             role: 'user',
@@ -245,6 +294,8 @@ Please provide:
       setPrepLoading(false)
     }
   }
+
+  const appliedCount = jobs.filter(j => j.status !== 'saved').length
 
   return (
     <div className="page">
@@ -315,6 +366,8 @@ Please provide:
       )}
 
       {view === 'kanban' && (
+        <>
+        <PunchCard filled={appliedCount} />
         <div className="jh-kanban">
           {STAGES.map(stage => (
             <div key={stage} className="jh-column">
@@ -336,6 +389,7 @@ Please provide:
             </div>
           ))}
         </div>
+        </>
       )}
 
       {view === 'list' && (

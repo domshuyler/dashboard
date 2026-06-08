@@ -1,25 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import MDEditor from '@uiw/react-md-editor'
 import ReactMarkdown from 'react-markdown'
 import './Notes.css'
 import { supabase } from '../supabase'
 
 function Notes({ notes, setNotes }) {
-  document.title = 'Notes — Dashboard'
+  useEffect(() => { document.title = 'Notes — Dashboard' }, [])
+
   const [view, setView] = useState('list')
   const [activeNote, setActiveNote] = useState(null)
+  const [editMode, setEditMode] = useState(false)
+  const [editNote, setEditNote] = useState(null)
   const [search, setSearch] = useState('')
   const [filterTag, setFilterTag] = useState('')
   const [filterCategory, setFilterCategory] = useState('')
   const [aiPrompt, setAiPrompt] = useState('')
   const [aiResponse, setAiResponse] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
-  const [newNote, setNewNote] = useState({
-    title: '',
-    content: '',
-    category: '',
-    tags: ''
-  })
+  const [newNote, setNewNote] = useState({ title: '', content: '', category: '', tags: '' })
 
   const allTags = [...new Set(notes.flatMap(n => n.tags))]
   const allCategories = [...new Set(notes.map(n => n.category).filter(Boolean))]
@@ -34,57 +32,58 @@ function Notes({ notes, setNotes }) {
   })
 
   const saveNote = async () => {
-  if (!newNote.title.trim()) return
-  const tags = newNote.tags
-    ? newNote.tags.split(',').map(t => t.trim()).filter(Boolean)
-    : []
-  const note = {
-    id: Date.now(),
-    title: newNote.title,
-    content: newNote.content,
-    category: newNote.category,
-    tags,
-    created_at: new Date().toISOString()
-  }
-  const { error } = await supabase.from('notes').insert(note)
-  if (!error) {
-    setNotes([...notes, {
-      id: note.id,
-      title: note.title,
-      content: note.content,
-      category: note.category,
-      tags: note.tags,
-      createdAt: note.created_at
-    }])
-  }
-  setNewNote({ title: '', content: '', category: '', tags: '' })
-  setView('list')
-}
-
-const updateNote = async (id, updates) => {
-  const { error } = await supabase
-    .from('notes')
-    .update({
-      title: updates.title,
-      content: updates.content,
-      category: updates.category,
-      tags: updates.tags
-    })
-    .eq('id', id)
-
-  if (!error) {
-    setNotes(notes.map(n => n.id === id ? { ...n, ...updates } : n))
-  }
-}
-
-const deleteNote = async (id) => {
-  const { error } = await supabase.from('notes').delete().eq('id', id)
-  if (!error) {
-    setNotes(notes.filter(n => n.id !== id))
-    setActiveNote(null)
+    if (!newNote.title.trim()) return
+    const tags = newNote.tags
+      ? newNote.tags.split(',').map(t => t.trim()).filter(Boolean)
+      : []
+    const note = {
+      id: Date.now(),
+      title: newNote.title,
+      content: newNote.content,
+      category: newNote.category,
+      tags,
+      created_at: new Date().toISOString()
+    }
+    const { error } = await supabase.from('notes').insert(note)
+    if (!error) {
+      setNotes([...notes, {
+        id: note.id,
+        title: note.title,
+        content: note.content,
+        category: note.category,
+        tags: note.tags,
+        createdAt: note.created_at
+      }])
+    }
+    setNewNote({ title: '', content: '', category: '', tags: '' })
     setView('list')
   }
-}
+
+  const updateNote = async () => {
+    if (!editNote.title.trim()) return
+    const tags = typeof editNote.tags === 'string'
+      ? editNote.tags.split(',').map(t => t.trim()).filter(Boolean)
+      : editNote.tags
+    const updates = { title: editNote.title, content: editNote.content, category: editNote.category, tags }
+    const { error } = await supabase
+      .from('notes')
+      .update({ title: updates.title, content: updates.content, category: updates.category, tags: updates.tags })
+      .eq('id', editNote.id)
+    if (!error) {
+      setNotes(notes.map(n => n.id === editNote.id ? { ...n, ...updates } : n))
+      setActiveNote({ ...activeNote, ...updates })
+      setEditMode(false)
+    }
+  }
+
+  const deleteNote = async (id) => {
+    const { error } = await supabase.from('notes').delete().eq('id', id)
+    if (!error) {
+      setNotes(notes.filter(n => n.id !== id))
+      setActiveNote(null)
+      setView('list')
+    }
+  }
 
   const askAI = async (prompt) => {
     setAiLoading(true)
@@ -94,22 +93,20 @@ const deleteNote = async (id) => {
     ).join('\n\n---\n\n')
 
     try {
-     const response = await fetch('/api/chat', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    model: 'claude-sonnet-4-5',
-    max_tokens: 1000,
-    system: '...',
-    messages: updatedMessages
-  })
-})
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5',
+          max_tokens: 1024,
+          system: `You are a helpful assistant with access to the user's personal notes. Use the notes as context to answer questions, find connections, and provide insights.\n\nUser's notes:\n\n${notesContext}`,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      })
       const data = await response.json()
       setAiResponse(data.content[0].text)
-    } catch (error) {
-      console.error('Error:', error)
+    } catch (err) {
+      console.error('Error:', err)
     } finally {
       setAiLoading(false)
     }
@@ -164,7 +161,7 @@ const deleteNote = async (id) => {
               <div className="notes-empty">No notes found. Create your first note!</div>
             )}
             {filteredNotes.map(note => (
-              <div key={note.id} className="note-card" onClick={() => { setActiveNote(note); setView('detail') }}>
+              <div key={note.id} className="note-card" onClick={() => { setActiveNote(note); setEditMode(false); setView('detail') }}>
                 <div className="note-card-title">{note.title}</div>
                 {note.category && <div className="note-card-category">{note.category}</div>}
                 <div className="note-card-preview">
@@ -234,13 +231,54 @@ const deleteNote = async (id) => {
               <button className="notes-btn" onClick={() => summarizeNote(activeNote)}>Summarize</button>
               <button className="notes-btn" onClick={() => expandNote(activeNote)}>Expand</button>
               <button className="notes-btn" onClick={() => findConnections(activeNote)}>Connections</button>
+              <button className="notes-btn" onClick={() => { setEditNote({ ...activeNote, tags: activeNote.tags.join(', ') }); setEditMode(true) }}>Edit</button>
               <button className="notes-btn-danger" onClick={() => deleteNote(activeNote.id)}>Delete</button>
               <button className="notes-btn" onClick={() => setView('list')}>Back</button>
             </div>
           </div>
-          <div className="note-content">
-            <ReactMarkdown>{activeNote.content}</ReactMarkdown>
-          </div>
+
+          {editMode && editNote && (
+            <div className="note-editor" style={{ marginBottom: '1.5rem' }}>
+              <input
+                type="text"
+                placeholder="Note title..."
+                value={editNote.title}
+                onChange={(e) => setEditNote({ ...editNote, title: e.target.value })}
+                className="note-title-input"
+              />
+              <div className="note-meta-inputs">
+                <input
+                  type="text"
+                  placeholder="Category..."
+                  value={editNote.category}
+                  onChange={(e) => setEditNote({ ...editNote, category: e.target.value })}
+                />
+                <input
+                  type="text"
+                  placeholder="Tags (comma separated)..."
+                  value={editNote.tags}
+                  onChange={(e) => setEditNote({ ...editNote, tags: e.target.value })}
+                />
+              </div>
+              <div data-color-mode="dark">
+                <MDEditor
+                  value={editNote.content}
+                  onChange={(val) => setEditNote({ ...editNote, content: val || '' })}
+                  height={400}
+                />
+              </div>
+              <div className="note-editor-actions">
+                <button className="notes-btn-accent" onClick={updateNote}>Save Changes</button>
+                <button className="notes-btn" onClick={() => setEditMode(false)}>Cancel</button>
+              </div>
+            </div>
+          )}
+
+          {!editMode && (
+            <div className="note-content">
+              <ReactMarkdown>{activeNote.content}</ReactMarkdown>
+            </div>
+          )}
         </div>
       )}
 
@@ -266,7 +304,7 @@ const deleteNote = async (id) => {
             <button
               className="notes-btn-accent"
               onClick={() => { askAI(aiPrompt); setAiPrompt('') }}
-              disabled={aiLoading}
+              disabled={aiLoading || !aiPrompt.trim()}
             >
               Ask
             </button>

@@ -1,9 +1,10 @@
 import ReactMarkdown from 'react-markdown'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './Chat.css'
 
 function Chat() {
-  document.title = 'Chat — Dashboard'
+  useEffect(() => { document.title = 'Chat — Dashboard' }, [])
+
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -19,26 +20,20 @@ function Chat() {
 
     try {
       const response = await fetch('/api/chat', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    model: 'claude-sonnet-4-5',
-    max_tokens: 1000,
-    system: '...',
-    messages: updatedMessages
-  })
-})
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5',
+          max_tokens: 1024,
+          system: 'You are a helpful personal assistant embedded in the user\'s dashboard. Be concise, practical, and direct.',
+          messages: updatedMessages
+        })
+      })
 
       const data = await response.json()
-      const assistantMessage = {
-        role: 'assistant',
-        content: data.content[0].text
-      }
-      setMessages([...updatedMessages, assistantMessage])
-    } catch (error) {
-      console.error('Error:', error)
+      setMessages([...updatedMessages, { role: 'assistant', content: data.content[0].text }])
+    } catch (err) {
+      console.error('Error:', err)
     } finally {
       setLoading(false)
     }
@@ -61,10 +56,10 @@ function Chat() {
         {messages.map((msg, index) => (
           <div key={index} className={`chat-message ${msg.role}`}>
             <div className="message-bubble">
-  {msg.role === 'assistant' 
-    ? <ReactMarkdown>{msg.content}</ReactMarkdown> 
-    : msg.content}
-</div>
+              {msg.role === 'assistant'
+                ? <ReactMarkdown>{msg.content}</ReactMarkdown>
+                : msg.content}
+            </div>
           </div>
         ))}
         {loading && (
